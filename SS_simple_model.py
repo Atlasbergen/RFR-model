@@ -6,7 +6,7 @@ R = 8.314  # [J/(mol*K)]
 r_inner = 0.0025  # [m]
 w_cat = 0.00011  # [kg]
 r_part = 1.5e-6  # [m]
-T_0 = 260 + 273.15  # [K]
+T_0 = 280 + 273.15  # [K]
 F_A0 = 1e-6  # [mol/s]
 P_A0 = 0.1  # [atm]
 
@@ -21,7 +21,7 @@ Ea_H2O = -86450  # [J/mol]
 Ea_HCHO = 86000  # [J/mol]
 
 y_A0 = 0.1
-eps = y_A0 * 0.5 # 0.5 from: CH3OH + 0.5O2 -> HCHO + H2O
+eps = y_A0 * 0.5  # 0.5 from: CH3OH + 0.5O2 -> HCHO + H2O
 
 
 # Arrhenius equation. Used for rate constant and equilibrium constants (based on kinetics from Deshmuk).
@@ -42,10 +42,17 @@ def r(P: float, T: float, X: float) -> float:
             )
         )
         * (
-            (k(A_O2, T, Ea_O2) * (P * ((1 + 0.5 * X) / (1 + eps * X))) ** 0.5)
-            / (1 + k(A_O2, T, Ea_O2) * (P * ((1 + 0.5 * X) / (1 + eps * X))) ** 0.5)
+            (k(A_O2, T, Ea_O2) * abs((P * ((1 - 0.5 * X) / (1 + eps * X)))) ** 0.5)
+            / (1 + k(A_O2, T, Ea_O2) * abs((P * ((1 - 0.5 * X) / (1 + eps * X)))) ** 0.5)
         )
     )
+
+
+# def event(t, y):
+#     return y[0] - 0.99
+#
+#
+# event.terminal = True
 
 
 def dXdw(w, X):
@@ -55,14 +62,14 @@ def dXdw(w, X):
 w_span = (0, w_cat)
 X_0 = [0]
 
-
 sol = solve_ivp(
-    dXdw, w_span, X_0, method="RK45", t_eval=np.linspace(w_span[0], w_span[1], 1000)
+    dXdw,
+    w_span,
+    X_0,
+    method="RK45",
+    t_eval=np.linspace(w_span[0], w_span[1], 1000),
+    # events=event
 )
-
 
 w = sol.t
 Y = sol.y[0]
-
-plt.plot(w, Y)
-plt.show()
