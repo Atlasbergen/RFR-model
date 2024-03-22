@@ -8,15 +8,15 @@ R = 8.314  # [J/(mol*K)]
 r_inner = 0.0025  # [m]
 w_cat = 0.00011  # [kg]
 r_part = 150e-6  # [m]
-T_0 = 260 + 273.15  # [K]
-F_A0 = 1e-6  # [mol/s]
-F_B0 = 0.5e-6  # [mol/S]
+T_0 = 280 + 273.15  # [K]
+F_A0 = 1e-5  # [mol/s]
+F_B0 = 0.5e-5  # [mol/S]
 F_C0 = 0  # [mol/s]
 F_D0 = 0  # [mol/s]
 F_E0 = 0  # [mol/s]
 F_F0 = 0  # [mol/s]
 F_G0 = 0  # [mol/s]
-F_I0 = 8e-6  # [mol/s]
+F_I0 = 8e-5  # [mol/s]
 F_T0 = F_A0 + F_B0 + F_I0
 P_0 = 1  # [atm]
 
@@ -46,12 +46,12 @@ def porosity(d_t, d_p):
     return 0.38 + 0.0073 * (1 + (((d_t / d_p) - 2) / (d_t / d_p)) ** 2)
 
 
-# function for crosssectional area 
+# function for crosssectional area
 def A_c(r):
     return 3.14*(r**2)
 
 
-# volumetric flow 
+# volumetric flow
 def q_dot(F_T, P, T):
     return F_T*R*T/(P*101325)
 
@@ -61,7 +61,7 @@ def u(F_T, P, T, r):
     return q_dot(F_T, P, T) / (3.14*(r**2))
 
 
-# Superficial mass velocity 
+# Superficial mass velocity
 def G(F_T, P, T, r):
     return rho_air(T)*u(F_T, P, T, r)
 
