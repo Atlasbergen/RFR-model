@@ -1,59 +1,62 @@
 import polars as pl
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
 
-df1 = pl.read_csv("Air_density.csv")
-df2 = pl.read_csv("Air_viscosity.csv")
+R = 8.314  # [J/(mol*K)]
+r_inner = 0.0025  # [m]
+rho_cat = 700  # [kg/m³]
+w_cat = 0.00011  # [kg]
+r_part = 150e-6  # [m]
+T_0 = 260 + 273.15  # [K]
+F_A0 = 1e-4  # [mol/s]
+F_B0 = 1e-4  # [mol/S]
+F_C0 = 0  # [mol/s]
+F_D0 = 0  # [mol/s]
+F_E0 = 0  # [mol/s]
+F_F0 = 0  # [mol/s]
+F_G0 = 0  # [mol/s]
+F_I0 = 8e-4  # [mol/s]
+F_T0 = F_A0 + F_B0 + F_I0
+P_0 = 1  # [atm]
 
-temp_density, air_density = np.array(df1[0:, 1]), np.array(df1[0:, 2])
-
-temp_viscosity, air_viscosity = np.array(df2[0:, 1]), np.array(df2[0:, 3])
-
-rho_air = interp1d(temp_density, air_density, kind="cubic")
-
-mu_air = interp1d(temp_viscosity, air_viscosity, kind="cubic")
-
-
-def porosity(d_t, d_p):
-    return 0.38 + 0.0073 * (1 + (((d_t / d_p) - 2) / (d_t / d_p)) ** 2)
-
-
-temp_cp = np.array([300, 400, 500, 600, 800, 1000, 1500])
-a1 = interp1d(temp_cp, [4.68, 0.864, -1.85, -4.61, -7.49, -8.53, -7.37], kind="cubic")
-a2 = interp1d(temp_cp, [9.04, 12.6, 15.5, 17.5, 20.1, 21.6, 23.9], kind="cubic")
-a3 = interp1d(temp_cp, [5.69, 7.37, 8.89, 10.5, 13.1, 15.2, 17.9], kind="cubic")
-a4 = interp1d(temp_cp, [11.4, 13.9, 15.7, 17.5, 19.4, 20.4, 20.6], kind="cubic")
-
-
-def C_p(T, n_C, n_H, n_O):
-    return a1(T) + a2(T)*n_C + a3(T)*n_H + a4(T)*n_O
-
+A_CH3OH = 2.6e-4  # [atm^-1]
+A_O2 = 1.423e-5  # [atm^-0.5]
+A_H2O = 5.5e-7  # [atm^-1]
+A_HCHO = 1.5e7  # [mol/(kg_cat s)]
+A_CO = 3.5e2  # [mol/(kg_cat s atm)]
+A_DMEf = 1.9e5  # [mol/(kg_cat s atm)]
+A_DMMf = 4.26e-6  # [mol/(kg_cat s atm²)]
+A_DME = 5e-7  # [atm^-1]
+A_DMEHCHO = 6.13e5  # [mol/(kg_cat s)]
 
 
-def C_p_HCHO(T):
-    return C_p(T, 1, 2, 1)
+Ea_CH3OH = -56780  # [J/mol]
+Ea_O2 = -60320  # [J/mol]
+Ea_H2O = -86450  # [J/mol]
+Ea_HCHO = 86000  # [J/mol]
+Ea_CO = 46000  # [J/mol]
+Ea_DMEf = 77000  # [J/mol]
+Ea_DMMf = 46500  # [J/mol]
+Ea_DME = -96720  # [J/mol]
+Ea_DMEHCHO = 98730  # [J/mol]
 
+df = pl.read_csv("Air_viscosity.csv")
 
-def C_p_Me(T):
-    return C_p(T, 1, 4, 1)
+temp_viscosity, air_viscosity = np.array(df[0:, 0]), np.array(df[0:, 1])
 
+temp_cp = np.array([298.15, 400, 500, 600, 800, 1000, 1500])
 
-def C_p_H2O(T):
-    return C_p(T, 0, 2, 1)
+H_f_O2, H_f_N2, H_f_CO, H_f_H2O, H_f_Me, H_f_HCHO, H_f_DME, H_f_DMM = [0, 0, -110.53e3, -241.818e3, -200.94e3, -108.6e3, -184.1e3, -348.5e3]
 
+H_rxn0_1 = (H_f_HCHO + H_f_H2O) - (H_f_Me + 0.5*H_f_O2)
 
-def C_p_O2(T):
-    return C_p(T, 0, 0, 2)
+H_rxn0_2 = (H_f_CO + H_f_H2O) - (H_f_HCHO + H_f_O2)
 
+H_rxn0_3 = (H_f_DME + H_f_H2O) - (2*H_f_Me)
 
-def C_p_CO(T):
-    return C_p(T, 1, 0, 1)
+H_rxn0_3_rev = -H_rxn0_3
 
+H_rxn0_4 = (H_f_DMM + H_f_H2O) - (2*H_f_Me + H_f_HCHO)
 
-def C_p_DME(T):
-    return C_p(T, 2, 6, 1)
+H_rxn0_4_rev = -H_rxn0_4
 
-
-def C_p_DMM(T):
-    return C_p(T, 3, 8, 2)
+H_rxn0_5 = (2*H_f_HCHO + H_f_H2O) - (H_f_DME + H_f_O2)
