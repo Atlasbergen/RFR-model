@@ -8,13 +8,13 @@ def dFdw(w, F):
     F_T = F_A + F_B + F_C + F_D + F_E + F_F + F_G + F_I
     
     return [
-        -r_1(F_A, F_B, F_D, F_T, P, T_0) - 2*r_3(F_A, F_D, F_F, F_T, P, T_0) - 2*r_4(F_A, F_C, F_D, F_G, F_T, P, T_0),
-        -0.5*(r_1(F_A, F_B, F_D, F_T, P, T_0) + r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T_0) + r_5(F_B, F_F, F_T, P, T_0)),
-        r_1(F_A, F_B, F_D, F_T, P, T_0) - r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T_0) - r_4(F_A, F_C, F_D, F_G, F_T, P, T_0) + r_5(F_B, F_F, F_T, P, T_0),
-        r_1(F_A, F_B, F_D, F_T, P, T_0) + r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T_0) + r_3(F_A, F_D, F_F, F_T, P, T_0) + r_4(F_A, F_C, F_D, F_G, F_T, P, T_0) + 0.5*r_5(F_B, F_F, F_T, P, T_0),
-        r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T_0),
-        r_3(F_A, F_D, F_F, F_T, P, T_0) - 0.5*r_5(F_B, F_F, F_T, P, T_0),
-        r_4(F_A, F_C, F_D, F_G, F_T, P, T_0),
+        -r_1(F_A, F_B, F_D, F_T, P, T) - 2*r_3(F_A, F_D, F_F, F_T, P, T) - 2*r_4(F_A, F_C, F_D, F_G, F_T, P, T),
+        -0.5*(r_1(F_A, F_B, F_D, F_T, P, T) + r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T) + r_5(F_B, F_F, F_T, P, T)),
+        r_1(F_A, F_B, F_D, F_T, P, T) - r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T) - r_4(F_A, F_C, F_D, F_G, F_T, P, T) + r_5(F_B, F_F, F_T, P, T),
+        r_1(F_A, F_B, F_D, F_T, P, T) + r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T) + r_3(F_A, F_D, F_F, F_T, P, T) + r_4(F_A, F_C, F_D, F_G, F_T, P, T) + 0.5*r_5(F_B, F_F, F_T, P, T),
+        r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T),
+        r_3(F_A, F_D, F_F, F_T, P, T) - 0.5*r_5(F_B, F_F, F_T, P, T),
+        r_4(F_A, F_C, F_D, F_G, F_T, P, T),
         0,
         -(B_0(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r_inner, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*(F_T/F_T0)*0.0000098692,
         ((-r_1(F_A, F_B, F_D, F_T, P, T)*H_rxn_1(T))+(-r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T)*H_rxn_2(T))+(-r_3(F_A, F_D, F_F, F_T, P, T)*H_rxn_3(T))+(-r_4(F_A, F_C, F_D, F_G, F_T, P, T)*H_rxn_4(T))+(-r_5(F_B, F_F, F_T, P, T)*H_rxn_5(T)))/(F_A*C_p_Me(T) + F_B*C_p_O2(T) + F_C*C_p_HCHO(T) + F_D*C_p_H2O(T) + F_E*C_p_CO(T) + F_F*C_p_DME(T) + F_G*C_p_DMM(T) + F_I*C_p_N2(T)),
