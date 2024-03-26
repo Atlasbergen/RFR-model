@@ -1,6 +1,3 @@
-import polars as pl
-import numpy as np
-
 R = 8.314  # [J/(mol*K)]
 r_inner = 0.0025  # [m]
 rho_cat = 700  # [kg/m³]
@@ -38,12 +35,6 @@ Ea_DMEf = 77000  # [J/mol]
 Ea_DMMf = 46500  # [J/mol]
 Ea_DME = -96720  # [J/mol]
 Ea_DMEHCHO = 98730  # [J/mol]
-
-df = pl.read_csv("Air_viscosity.csv")  # data found in perry (2-196)
-
-temp_viscosity, air_viscosity = np.array(df[0:, 0]), np.array(df[0:, 1])
-
-temp_cp = np.array([298.15, 400, 500, 600, 800, 1000, 1500])
 
 H_f_O2, H_f_N2, H_f_CO, H_f_H2O, H_f_Me, H_f_HCHO, H_f_DME, H_f_DMM = [0, 0, -110.53e3, -241.818e3, -200.94e3, -108.6e3, -184.1e3, -348.5e3]
 

@@ -1,8 +1,7 @@
 from data import *
 from scipy.interpolate import interp1d
 from scipy.integrate import quad
-
-mu_air = interp1d(temp_viscosity, air_viscosity, kind="cubic")
+import numpy as np
 
 
 def mu(T, C1, C2, C3):
@@ -17,50 +16,40 @@ def porosity(d_t, d_p):
     return 0.38 + 0.0073 * (1 + (((d_t / d_p) - 2) / (d_t / d_p)) ** 2)
 
 
-a1 = interp1d(temp_cp, [4.68, 0.864, -1.85, -4.61, -7.49, -8.53, -7.37], kind="cubic")
-a2 = interp1d(temp_cp, [9.04, 12.6, 15.5, 17.5, 20.1, 21.6, 23.9], kind="cubic")
-a3 = interp1d(temp_cp, [5.69, 7.37, 8.89, 10.5, 13.1, 15.2, 17.9], kind="cubic")
-a4 = interp1d(temp_cp, [11.4, 13.9, 15.7, 17.5, 19.4, 20.4, 20.6], kind="cubic")
-
-
-def C_p(T, n_C, n_H, n_O):
-    return a1(T) + a2(T)*n_C + a3(T)*n_H + a4(T)*n_O
-
-
-def C_p_2(T, C1, C2, C3, C4, C5):
+def C_p(T, C1, C2, C3, C4, C5):
     return (C1 + (C2*(C3/(T*np.sinh(C3/T)))**2) + (C4*(C5/(T*np.cosh(C5/T)))**2))*1e-3
 
 
 def C_p_HCHO(T):
-    return C_p_2(T, 0.33503e5, 0.49394e5, 1.92800e3, 0.29728e5, 965.04)
+    return C_p(T, 0.33503e5, 0.49394e5, 1.92800e3, 0.29728e5, 965.04)
 
 
 def C_p_Me(T):
-    return C_p_2(T, 0.39252e5, 0.87900e5, 1.91650e3, 0.53654e5, 896.7)
+    return C_p(T, 0.39252e5, 0.87900e5, 1.91650e3, 0.53654e5, 896.7)
 
 
 def C_p_H2O(T):
-    return C_p_2(T, 0.33363e5, 0.26790e5, 2.61050e3, 0.08896e5, 1169)
+    return C_p(T, 0.33363e5, 0.26790e5, 2.61050e3, 0.08896e5, 1169)
 
 
 def C_p_O2(T):
-    return C_p_2(T, 0.29103e5, 0.10040e5, 2.52650e3, 0.09356e5, 1153.8)
+    return C_p(T, 0.29103e5, 0.10040e5, 2.52650e3, 0.09356e5, 1153.8)
 
 
 def C_p_N2(T):
-    return C_p_2(T, 0.29105e5, 0.08615e5, 1.70160e3, 0.00103e5, 909.79)
+    return C_p(T, 0.29105e5, 0.08615e5, 1.70160e3, 0.00103e5, 909.79)
 
 
 def C_p_CO(T):
-    return C_p_2(T, 0.29108e5, 0.08773e5, 3.08510e3, 0.08455e5, 1538.2)
+    return C_p(T, 0.29108e5, 0.08773e5, 3.08510e3, 0.08455e5, 1538.2)
 
 
 def C_p_DME(T):
-    return C_p_2(T, 0.57431e5, 0.94494e5, 0.89551e3, 0.65065e5, 2467.4)
+    return C_p(T, 0.57431e5, 0.94494e5, 0.89551e3, 0.65065e5, 2467.4)
 
 
 def C_p_DMM(T):
-    return C_p(T, 3, 8, 2)
+    return 51.161 + 0.16244*T + 8.26e-5*(T**2) + (-8.51e-8*(T**3))
 
 
 def del_Cp_1(T):
@@ -124,7 +113,7 @@ def G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r):
 
 
 def B_0(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
-    return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*mu_air(T))/d_p) + 1.75*G(F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0, P_0, T_0, r)))
+    return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*mu(T, 6.5592E-07, 0.6081 , 54.714))/d_p) + 1.75*G(F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0, P_0, T_0, r)))
 
 
 def K_eq_DME(T):
