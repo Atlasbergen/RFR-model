@@ -5,6 +5,10 @@ from scipy.integrate import quad
 mu_air = interp1d(temp_viscosity, air_viscosity, kind="cubic")
 
 
+def mu(T, C1, C2, C3):
+    return C1*(T**C2)/(1 + (C3/T))
+
+
 def rho_mix(T, P, F_tot, F_meth, F_HCHO, F_DME, F_DMM, F_CO, F_H2O, F_O2, F_N2):
     return 32.042e-3*(F_meth*P*101325/(R*T*F_tot)) + 32e-3*(F_O2*P*101325/(R*T*F_tot)) + 28e-3*(F_N2*P*101325/(R*T*F_tot)) + 18e-3*(F_H2O*P*101325/(R*T*F_tot)) + 30e-3*(F_HCHO*P*101325/(R*T*F_tot)) + 28e-3*(F_CO*P*101325/(R*T*F_tot)) + 46.047e-3*(F_DME*P*101325/(R*T*F_tot)) + 76.097e-3*(F_DMM*P*101325/(R*T*F_tot))
 

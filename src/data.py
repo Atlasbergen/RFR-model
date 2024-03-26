@@ -39,7 +39,7 @@ Ea_DMMf = 46500  # [J/mol]
 Ea_DME = -96720  # [J/mol]
 Ea_DMEHCHO = 98730  # [J/mol]
 
-df = pl.read_csv("Air_viscosity.csv")
+df = pl.read_csv("Air_viscosity.csv")  # data found in perry (2-196)
 
 temp_viscosity, air_viscosity = np.array(df[0:, 0]), np.array(df[0:, 1])
 
