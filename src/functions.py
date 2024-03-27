@@ -1,10 +1,9 @@
 from data import *
-from scipy.interpolate import interp1d
 from scipy.integrate import quad
 import numpy as np
 
 
-def mu(T, C1, C2, C3):
+def mu(T, C1, C2, C3):  # Perry 2-267
     return C1*(T**C2)/(1 + (C3/T))
 
 
@@ -16,7 +15,7 @@ def porosity(d_t, d_p):
     return 0.38 + 0.0073 * (1 + (((d_t / d_p) - 2) / (d_t / d_p)) ** 2)
 
 
-def C_p(T, C1, C2, C3, C4, C5):
+def C_p(T, C1, C2, C3, C4, C5):  # perry 2-149
     return (C1 + (C2*(C3/(T*np.sinh(C3/T)))**2) + (C4*(C5/(T*np.cosh(C5/T)))**2))*1e-3
 
 
@@ -48,12 +47,12 @@ def C_p_DME(T):
     return C_p(T, 0.57431e5, 0.94494e5, 0.89551e3, 0.65065e5, 2467.4)
 
 
-def C_p_DMM(T):
+def C_p_DMM(T):  # Properties of gases and liquids Table C-1
     return 51.161 + 0.16244*T + 8.26e-5*(T**2) + (-8.51e-8*(T**3))
 
 
 def del_Cp_1(T):
-    return C_p_HCHO(T) + C_p_H2O(T) - C_p_Me(T) - 0.5*C_p_O2(T)
+    return C_p_HCHO(T) + C_p_H2O(T) - (C_p_Me(T) + 0.5*C_p_O2(T))
 
 
 def del_Cp_2(T):
@@ -172,8 +171,13 @@ def r_3(F_A: float, F_D: float, F_F: float, F_T: float, P: float, T: float) -> f
 
 
 def r_4(F_A: float, F_C: float, F_D: float, F_G: float, F_T: float, P: float, T: float) -> float:
-    return k(A_DMMf, T, Ea_DMMf) * (P**2 * F_A * F_C/F_T**2) - (k(A_DMMf, T_0, Ea_DMMf)/K_eq_DMM(T))*(P*F_D*F_G/(F_A*F_T))
+    return k(A_DMMf, T, Ea_DMMf) * (P**2 * F_A * F_C/F_T**2) - (k(A_DMMf, T, Ea_DMMf)/K_eq_DMM(T))*(P*F_D*F_G/(F_A*F_T))
 
 
 def r_5(F_B: float, F_F: float, F_T: float, P: float, T: float) -> float:
     return k(A_DMEHCHO, T, Ea_DMEHCHO)*(k(A_DME, T, Ea_DME)*(P*F_F/F_T)/(1 + k(A_DME, T, Ea_DME)*(P*F_F/F_T)))*((k(A_O2, T, Ea_O2) * (P * F_B / F_T) ** 0.5)/(1 + (k(A_O2, T, Ea_O2) * (P * F_B / F_T) ** 0.5)))
+
+
+if __name__ == "__main__":
+    # test things here
+    print(mu(300, 3.0663E-07, 0.69655, 205))
