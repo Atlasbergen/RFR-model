@@ -1,23 +1,52 @@
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from functions import *
+from classes import *
+
+CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2 = [
+    Molecule("Methanol", Mw_Me, H_f_Me, Param_Mu_Me, Param_Cp_Me),
+    Molecule("Oxygen", Mw_O2, H_f_O2, Param_Mu_O2, Param_Cp_O2),
+    Molecule("Formaldehyde", Mw_HCHO, H_f_HCHO, Param_Mu_HCHO, Param_Cp_HCHO),
+    Molecule("Water", Mw_H2O, H_f_H2O, Param_Mu_H2O, Param_Cp_H2O),
+    Molecule("Carbon Monoxide", Mw_CO, H_f_CO, Param_Mu_CO, Param_Cp_CO),
+    Molecule("DME", Mw_DME, H_f_DME, Param_Mu_DME, Param_Cp_DME),
+    Molecule("DMM", Mw_DMM, H_f_DMM, [0, 0, 0], [0, 0, 0, 0]),
+    Molecule("Nitrogen", Mw_N2, H_f_N2, Param_Mu_N2, Param_Cp_N2),
+]
+
+
+r1, r2, r3, r4, r5 = [
+    Reaction("reaction_1", [1, 0.5], [1, 1], [CH3OH, O2], [HCHO, H2O]),
+    Reaction("reaction_2", [1, 0.5], [1, 1], [HCHO, O2], [CO, H2O]),
+    Reaction("reaction_3", [2], [1, 1], [CH3OH], [DME, H2O]),
+    Reaction("reaction_4", [2, 1], [1, 1], [CH3OH, HCHO], [DMM, H2O]),
+    Reaction("reaction_5", [1, 1], [2, 1], [DME, O2], [HCHO, H2O]),
+]
+
+
+def mu_mix(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, F_T):
+    return (F_A/F_T)*CH3OH.mu(T, P) + (F_B/F_T)*O2.mu(T, P) + (F_C/F_T)*HCHO.mu(T, P) + (F_D/F_T)*H2O.mu(T, P) + (F_E/F_T)*CO.mu(T, P) + (F_F/F_T)*DME.mu(T, P) + (F_G/F_T)*DMM.mu(T, P) + (F_I/F_T)*N2.mu(T, P)
+
+
+def B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
+    return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*mu_mix(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, F_T))/d_p) + 1.75*G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)))
 
 
 def dFdw(w, F):
     F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T = F
     F_T = F_A + F_B + F_C + F_D + F_E + F_F + F_G + F_I
-    
+
     return [
-        -r_1(F_A, F_B, F_D, F_T, P, T) - 2*r_3(F_A, F_D, F_F, F_T, P, T) - 2*r_4(F_A, F_C, F_D, F_G, F_T, P, T),
-        -0.5*(r_1(F_A, F_B, F_D, F_T, P, T) + r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T) + r_5(F_B, F_F, F_T, P, T)),
-        r_1(F_A, F_B, F_D, F_T, P, T) - r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T) - r_4(F_A, F_C, F_D, F_G, F_T, P, T) + r_5(F_B, F_F, F_T, P, T),
-        r_1(F_A, F_B, F_D, F_T, P, T) + r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T) + r_3(F_A, F_D, F_F, F_T, P, T) + r_4(F_A, F_C, F_D, F_G, F_T, P, T) + 0.5*r_5(F_B, F_F, F_T, P, T),
-        r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T),
-        r_3(F_A, F_D, F_F, F_T, P, T) - 0.5*r_5(F_B, F_F, F_T, P, T),
-        r_4(F_A, F_C, F_D, F_G, F_T, P, T),
+        -(r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + 2*r3.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + 2*r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)),
+        -0.5*(r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)),
+        (r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)) - (r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)),
+        r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r3.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T),
+        r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T),
+        r3.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) - 0.5*r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T),
+        r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T),
         0,
-        -(B_0(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r_inner, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*(F_T/F_T0)*0.0000098692,
-        ((-r_1(F_A, F_B, F_D, F_T, P, T)*H_rxn_1(T))+(-r_2(F_A, F_B, F_C, F_D, F_E, F_T, P, T)*H_rxn_2(T))+(-r_3(F_A, F_D, F_F, F_T, P, T)*H_rxn_3(T))+(-r_4(F_A, F_C, F_D, F_G, F_T, P, T)*H_rxn_4(T))+(-r_5(F_B, F_F, F_T, P, T)*H_rxn_5(T)))/(F_A*C_p_Me(T) + F_B*C_p_O2(T) + F_C*C_p_HCHO(T) + F_D*C_p_H2O(T) + F_E*C_p_CO(T) + F_F*C_p_DME(T) + F_G*C_p_DMM(T) + F_I*C_p_N2(T)),
+        -(B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r_inner, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*(F_T/F_T0)*0.0000098692,
+        ((-r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r1.H_rxn(T))+(-r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r2.H_rxn(T))+(-r3.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r3.H_rxn(T))+(-r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r4.H_rxn(T))+(-r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r5.H_rxn(T)))/(F_A*CH3OH.Cp(T) + F_B*O2.Cp(T) + F_C*HCHO.Cp(T) + F_D*H2O.Cp(T) + F_E*CO.Cp(T) + F_F*DME.Cp(T) + F_G*DMM.Cp(T) + F_I*N2.Cp(T)),
     ]
 
 
@@ -49,7 +78,7 @@ ax1.set_ylabel("F [mol/s]")
 ax1.legend([r"$F_{CH_3OH}$", r"$F_{O_2}$", r"$F_{HCHO}$", r"$F_{H_2O}$", r"$F_{CO}$", r"$F_{DME}$", r"$F_{DMM}$"], loc="center left")
 ax1.grid(color='0.8')
 
-ax2.plot(w, 1-Y_P, linewidth=0.9)
+ax2.plot(w, (P_0-Y_P), linewidth=0.9)
 ax2.tick_params(axis="both",direction="in")
 ax2.spines[["top", "right"]].set_visible(False)
 ax2.set_xlabel("catalyst weight, W [kg]")

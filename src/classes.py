@@ -18,18 +18,18 @@ class Molecule:
             X = 2.12574 + 2063.71/(T*1.8) + 0.00119260*self.M_w
             K = (16.7175+0.0419188*self.M_w)*((T*1.8)**1.40256)/(212.209 + 18.1349*self.M_w + T*1.8)
             Y = 2.447 + 0.0392851*X
-            return 1e-7*K*np.exp(X * self.rho(P*101325*1e-6, T)**Y)
+            return 1e-7*K*np.exp(X * self.rho(P*101325*1e-6, T)**Y)  # from article by O. Jeje and L. Mattar
         else:
-            return self.params_vis[0]*(T**self.params_vis[1])/(1 + (self.params_vis[2]/T))
+            return self.params_vis[0]*(T**self.params_vis[1])/(1 + (self.params_vis[2]/T))  # from perry 2-267
 
     def rho(self, P: float, T: float) -> float:
         return self.M_w*(P/(R*T))
 
     def Cp(self, T: float) -> float:
         if self.name == "DMM":
-            return 51.161 + 0.16244*T + 8.26e-5*(T**2) + (-8.51e-8*(T**3))
+            return 51.161 + 0.16244*T + 8.26e-5*(T**2) + (-8.51e-8*(T**3))  # C_p for DMM method of Joback parameters found in The properties of gases and liquids 
         else:
-            return (self.params_cp[0] + (self.params_cp[1]*(self.params_cp[2]/(T*np.sinh(self.params_cp[2]/T)))**2) + (self.params_cp[3]*(self.params_cp[4]/(T*np.cosh(self.params_cp[4]/T)))**2))*1e-3
+            return (self.params_cp[0] + (self.params_cp[1]*(self.params_cp[2]/(T*np.sinh(self.params_cp[2]/T)))**2) + (self.params_cp[3]*(self.params_cp[4]/(T*np.cosh(self.params_cp[4]/T)))**2))*1e-3  # from perry 2-149
 
 
 class Reaction:
@@ -62,6 +62,7 @@ class Reaction:
         self.reactants = reactants
         self.products = products
 
+    # Equilibrium constants from Deshmuk
     @staticmethod
     def K_eq_DME(T):
         return np.exp(-2.2158 + (2606.8 / T))
@@ -70,7 +71,7 @@ class Reaction:
     def K_eq_DMM(T):
         return np.exp(-20.416 + (9346.8 / T))
 
-    # Arrhenius equation. Used for rate constant and equilibrium constants (based on kinetics from Deshmuk).
+    # Arrhenius equation. Used for rate constant and adsorption constants (based on kinetics from Deshmuk).
     @staticmethod
     def k(A: float, T: float, Ea: float) -> float:
         return A * np.exp(-Ea / (R * T))
