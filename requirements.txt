@@ -1,6 +1,4 @@
-Package         Version
---------------- -----------
-matplotlib      3.8.3
-numpy           1.26.4
-pip             24.0
-scipy           1.12.0
+diffeqpy==2.4.1
+matplotlib==3.8.3
+numpy==1.26.4
+scipy==1.12.0

@@ -1,17 +1,17 @@
 R = 8.314  # [J/(mol*K)]
-r_inner = 0.0025  # [m]
+r_inner = 0.25  # [m]
 rho_cat = 1000  # [kg/m³]
-w_cat = 0.00011  # [kg]
+w_cat = 1.1  # [kg]
 r_part = 150e-6  # [m]
 T_0 = 260 + 273.15  # [K]
-F_A0 = 1e-4  # [mol/s]
-F_B0 = 1e-4  # [mol/S]
+F_A0 = 1  # [mol/s]
+F_B0 = 1  # [mol/S]
 F_C0 = 0  # [mol/s]
 F_D0 = 0  # [mol/s]
 F_E0 = 0  # [mol/s]
 F_F0 = 0  # [mol/s]
 F_G0 = 0  # [mol/s]
-F_I0 = 8e-4  # [mol/s]
+F_I0 = 8  # [mol/s]
 F_T0 = F_A0 + F_B0 + F_I0
 P_0 = 1  # [atm]
 
@@ -39,20 +39,6 @@ Ea_DMEHCHO = 98730  # [J/mol]
 
 # Perry (except DMM from CRC handbook)
 H_f_O2, H_f_N2, H_f_CO, H_f_H2O, H_f_Me, H_f_HCHO, H_f_DME, H_f_DMM = [0, 0, -110.53e3, -241.818e3, -200.94e3, -108.6e3, -184.1e3, -348.5e3]  # J/mol
-
-H_rxn0_1 = (H_f_HCHO + H_f_H2O) - (H_f_Me + 0.5*H_f_O2)
-
-H_rxn0_2 = (H_f_CO + H_f_H2O) - (H_f_HCHO + H_f_O2)
-
-H_rxn0_3 = (H_f_DME + H_f_H2O) - (2*H_f_Me)
-
-H_rxn0_3_rev = -H_rxn0_3
-
-H_rxn0_4 = (H_f_DMM + H_f_H2O) - (2*H_f_Me + H_f_HCHO)
-
-H_rxn0_4_rev = -H_rxn0_4
-
-H_rxn0_5 = (2*H_f_HCHO + H_f_H2O) - (H_f_DME + H_f_O2)
 
 # PubChem
 Mw_Me, Mw_O2, Mw_H2O, Mw_HCHO, Mw_CO, Mw_DME, Mw_DMM, Mw_N2 = [32.042, 32, 18.015, 30.026, 28.010, 46.07, 76.09, 28.014]  # g/mol

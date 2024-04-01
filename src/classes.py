@@ -33,7 +33,7 @@ class Molecule:
 
 
 class Reaction:
-    
+
     A_CH3OH = 2.6e-4  # [atm^-1]
     A_O2 = 1.423e-5  # [atm^-0.5]
     A_H2O = 5.5e-7  # [atm^-1]
