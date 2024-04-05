@@ -6,12 +6,31 @@ R = 8.314
 
 class Molecule:
 
-    def __init__(self, name: str, M_w: float, H_f: float, params_vis: list, params_cp: list):
+    def __init__(self, name: str, M_w: float, H_f: float, T_boil: float, Vb: float, params_vis: list, params_cp: list, params_kappa: list):
         self.name = name
         self.M_w = M_w
         self.H_f = H_f
+        self.T_boil = T_boil
+        self.Vb = Vb
         self.params_vis = params_vis
         self.params_cp = params_cp
+        self.params_kappa = params_kappa
+
+    @staticmethod
+    def char_len(V_a: float, V_b: float) -> float:  # properties of gases and liquids 11-3, 11-4
+        return 0.59*((V_a**(1/3))+(V_b**(1/3)))
+
+    @staticmethod
+    def T_crit(T: float, T_a: float, T_b: float) -> float:  # properties of gases and liquids 11-3, 11-4
+        return T/(1.15*(T_a*T_b)**0.5)
+
+    @staticmethod
+    def collision_integral(T: float, T_a: float, T_b: float) -> float:  # properties of gases and liquids 11-3, 11-4
+        return (1.06036/(Molecule.T_crit(T, T_a, T_b)**0.15610)) + (0.19300/np.exp(0.47635*Molecule.T_crit(T, T_a, T_b))) + (1.03587/np.exp(1.52996*Molecule.T_crit(T, T_a, T_b))) + (1.76474/np.exp(3.89411*Molecule.T_crit(T, T_a, T_b)))
+
+    @staticmethod
+    def D_AB(T: float, P: float, T_a: float, T_b: float, V_a: float, V_b: float, M_wa: float, M_wb: float) -> float:  # properties of gases and liquids 11-3, 11-4
+        return (3.03-(0.98/(2/((1/M_wa)+(1/M_wb))**0.5)))*(T**(3/2))*e-7/((2/((1/M_wa)+(1/M_wb))**0.5)*P*(Molecule.charm_len(V_a, V_b)**2)*Molecule.collision_integral(T, T_a, T_b))
 
     def mu(self, T: float, P: float) -> float:
         if self.name == "DMM":
@@ -23,13 +42,16 @@ class Molecule:
             return self.params_vis[0]*(T**self.params_vis[1])/(1 + (self.params_vis[2]/T))  # from perry 2-267
 
     def rho(self, P: float, T: float) -> float:
-        return self.M_w*(P/(R*T))
+        return self.M_w*(abs(P)/(R*T))
 
     def Cp(self, T: float) -> float:
         if self.name == "DMM":
             return 51.161 + 0.16244*T + 8.26e-5*(T**2) + (-8.51e-8*(T**3))  # C_p for DMM method of Joback parameters found in The properties of gases and liquids 
         else:
             return (self.params_cp[0] + (self.params_cp[1]*(self.params_cp[2]/(T*np.sinh(self.params_cp[2]/T)))**2) + (self.params_cp[3]*(self.params_cp[4]/(T*np.cosh(self.params_cp[4]/T)))**2))*1e-3  # from perry 2-149
+
+    def kappa(self, T):  # perry 2-289
+        return self.params_kappa[0]*T**self.params_kappa[1] / (1 + (self.params_kappa[2]/T) + (self.params_kappa[3]/T**2))
 
 
 class Reaction:
@@ -117,8 +139,8 @@ class Reaction:
                     )
                 )
                 * (
-                    (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (P * F_B / F_T) ** 0.5)
-                    / (1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (P * F_B / F_T) ** 0.5))
+                    (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(P * F_B / F_T)) ** 0.5)
+                    / (1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(P * F_B / F_T)) ** 0.5))
                 )
             )
         elif self.name == "reaction_2":
@@ -133,8 +155,8 @@ class Reaction:
                     )
                 )
                 * (
-                    (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (P * F_B / F_T) ** 0.5)
-                    / (1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (P * F_B / F_T) ** 0.5))
+                    (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(P * F_B / F_T)) ** 0.5)
+                    / (1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(P * F_B / F_T)) ** 0.5))
                 )
             )
         elif self.name == "reaction_3":
@@ -142,6 +164,6 @@ class Reaction:
         elif self.name == "reaction_4":
             return Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf) * (P**2 * F_A * F_C/F_T**2) - (Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf)/Reaction.K_eq_DMM(T))*(P*F_D*F_G/(F_A*F_T))
         elif self.name == "reaction_5":
-            return Reaction.k(Reaction.A_DMEHCHO, T, Reaction.Ea_DMEHCHO)*(Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(P*F_F/F_T)/(1 + Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(P*F_F/F_T)))*((Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (P * F_B / F_T) ** 0.5)/(1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (P * F_B / F_T) ** 0.5)))
+            return Reaction.k(Reaction.A_DMEHCHO, T, Reaction.Ea_DMEHCHO)*(Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(P*F_F/F_T)/(1 + Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(P*F_F/F_T)))*((Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(P * F_B / F_T)) ** 0.5)/(1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(P * F_B / F_T)) ** 0.5)))
         else:
             return "Unknown reaction"

@@ -4,14 +4,14 @@ from functions import *
 from classes import *
 
 CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2 = [
-    Molecule("Methanol", Mw_Me, H_f_Me, Param_Mu_Me, Param_Cp_Me),
-    Molecule("Oxygen", Mw_O2, H_f_O2, Param_Mu_O2, Param_Cp_O2),
-    Molecule("Formaldehyde", Mw_HCHO, H_f_HCHO, Param_Mu_HCHO, Param_Cp_HCHO),
-    Molecule("Water", Mw_H2O, H_f_H2O, Param_Mu_H2O, Param_Cp_H2O),
-    Molecule("Carbon Monoxide", Mw_CO, H_f_CO, Param_Mu_CO, Param_Cp_CO),
-    Molecule("DME", Mw_DME, H_f_DME, Param_Mu_DME, Param_Cp_DME),
-    Molecule("DMM", Mw_DMM, H_f_DMM, [0, 0, 0], [0, 0, 0, 0]),
-    Molecule("Nitrogen", Mw_N2, H_f_N2, Param_Mu_N2, Param_Cp_N2),
+    Molecule("Methanol", Mw_Me, H_f_Me, Tb_Me, Vb_Me, Param_Mu_Me, Param_Cp_Me, Param_kappa_Me),
+    Molecule("Oxygen", Mw_O2, H_f_O2, Tb_O2, Vb_O2, Param_Mu_O2, Param_Cp_O2, Param_kappa_O2),
+    Molecule("Formaldehyde", Mw_HCHO, H_f_HCHO, Tb_HCHO, Vb_HCHO, Param_Mu_HCHO, Param_Cp_HCHO, Param_kappa_HCHO),
+    Molecule("Water", Mw_H2O, H_f_H2O, Tb_H2O, Vb_H2O, Param_Mu_H2O, Param_Cp_H2O, Param_kappa_H2O),
+    Molecule("Carbon Monoxide", Mw_CO, H_f_CO, Tb_CO, Vb_CO, Param_Mu_CO, Param_Cp_CO, Param_kappa_CO),
+    Molecule("DME", Mw_DME, H_f_DME, Tb_DME, Vb_DME, Param_Mu_DME, Param_Cp_DME, Param_kappa_DME),
+    Molecule("DMM", Mw_DMM, H_f_DMM, Tb_DMM, Vb_DMM, [0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]),
+    Molecule("Nitrogen", Mw_N2, H_f_N2, Tb_N2, Vb_N2, Param_Mu_N2, Param_Cp_N2, Param_kappa_N2),
 ]
 
 
@@ -58,17 +58,18 @@ prob = de.ODEProblem(dFdw, F_0, w_span)
 sol = de.solve(prob, de.Tsit5(), saveat=0.001)
 
 w = sol.t
+u_vals = np.array([sol(i) for i in w]).T
 
-Y_A = sol_vec(sol.u, 0)
-Y_B = sol_vec(sol.u, 1)
-Y_C = sol_vec(sol.u, 2)
-Y_D = sol_vec(sol.u, 3)
-Y_E = sol_vec(sol.u, 4)
-Y_F = sol_vec(sol.u, 5)
-Y_G = sol_vec(sol.u, 6)
+Y_A = u_vals[0]
+Y_B = u_vals[1]
+Y_C = u_vals[2]
+Y_D = u_vals[3]
+Y_E = u_vals[4]
+Y_F = u_vals[5]
+Y_G = u_vals[6]
 
-Y_P = sol_vec(sol.u, 8)
-Y_T = sol_vec(sol.u, 9)
+Y_P = u_vals[8]
+Y_T = u_vals[9]
 
 
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 10))
@@ -98,3 +99,4 @@ ax3.grid(color='0.8')
 plt.show()
 
 print((Y_A[0]-Y_A[-1])/Y_A[0])
+print(sol(w[-1]))

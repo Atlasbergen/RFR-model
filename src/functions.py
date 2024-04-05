@@ -35,14 +35,6 @@ def B_0(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
     return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*mu(T, 6.5592E-07, 0.6081 , 54.714))/d_p) + 1.75*G(F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0, P_0, T_0, r)))
 
 
-def sol_vec(sol_u, index: int) -> list:
-    x = []
-    for i in range(0, len(sol_u)):
-        x.append(sol_u[i][index])
-
-    return x
-
-
 if __name__ == "__main__":
     # test things here
-    print(mu(300, 3.0663E-07, 0.69655, 205))
+    print(u(F_T0, P_0, T_0, r_inner))

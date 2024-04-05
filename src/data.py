@@ -1,6 +1,8 @@
 R = 8.314  # [J/(mol*K)]
 r_inner = 0.25  # [m]
 rho_cat = 1000  # [kg/m³]
+sa_cat = 6e-3  # [m²/kg]
+alpha = sa_cat*rho_cat  # [m⁻¹]
 w_cat = 1.1  # [kg]
 r_part = 150e-6  # [m]
 T_0 = 260 + 273.15  # [K]
@@ -43,6 +45,12 @@ H_f_O2, H_f_N2, H_f_CO, H_f_H2O, H_f_Me, H_f_HCHO, H_f_DME, H_f_DMM = [0, 0, -11
 # PubChem
 Mw_Me, Mw_O2, Mw_H2O, Mw_HCHO, Mw_CO, Mw_DME, Mw_DMM, Mw_N2 = [32.042, 32, 18.015, 30.026, 28.010, 46.07, 76.09, 28.014]  # g/mol
 
+# boiling points 1 atm 
+Tb_Me, Tb_O2, Tb_H2O, Tb_HCHO, Tb_CO, Tb_DME, Tb_DMM, Tb_N2 = [337.8, 90.188, 373.15, 254, 81.6, 249, 315, 77]  # K
+
+# molar liquid volumes from schroeder properties of liquids and gases 4-10
+Vb_Me, Vb_O2, Vb_H2O, Vb_HCHO, Vb_CO, Vb_DME, Vb_DMM, Vb_N2 = [42.7, 21, 18.8, 35, 28, 63, 91, 28]  # cm³/mol
+
 # Perry
 Param_Cp_Me, Param_Cp_O2, Param_Cp_H2O, Param_Cp_HCHO, Param_Cp_CO, Param_Cp_DME, Param_Cp_N2 = [
     [0.39252e5, 0.87900e5, 1.91650e3, 0.53654e5, 896.7],
@@ -62,4 +70,14 @@ Param_Mu_Me, Param_Mu_O2, Param_Mu_H2O, Param_Mu_HCHO, Param_Mu_CO, Param_Mu_DME
     [1.1127e-6, 0.5338, 94.7],
     [2.6800e-6, 0.3975, 534],
     [6.5592e-7, 0.6081, 54.714],
+]
+
+Param_kappa_Me, Param_kappa_O2, Param_kappa_H2O, Param_kappa_HCHO, Param_kappa_CO, Param_kappa_DME, Param_kappa_N2 = [
+    [5.7992e-7, 1.7862, 0, 0],
+    [0.00044994, 0.7456, 56.699, 0],
+    [6.2041e-6, 1.3973, 0, 0],
+    [5.2201e-6, 1.417, 0, 0],
+    [0.00059882, 0.6863, 57.13, 501.92],
+    [0.059975, 0.2667, 1018.6, 1098800],
+    [0.00033143, 0.7722, 16.323, 373.72],
 ]
