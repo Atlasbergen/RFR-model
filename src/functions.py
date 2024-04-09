@@ -10,9 +10,17 @@ def porosity(d_t, d_p):
     return 0.38 + 0.0073 * (1 + (((d_t / d_p) - 2) / (d_t / d_p)) ** 2)
 
 
+def a_c(dt, dp):  # fogler sida -> 698
+    return 6*(1-porosity(dt, dp))/dp
+
+
 # the heat capacity functions will be removed in favor of the method in the Molecule class (The same for H_rxn)
 # def C_p(T, C1, C2, C3, C4, C5):  # perry 2-149
 #     return (C1 + (C2*(C3/(T*np.sinh(C3/T)))**2) + (C4*(C5/(T*np.cosh(C5/T)))**2))*1e-3
+
+
+# def mu_mix(T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, F_T):
+#     return (F_A/F_T)*CH3OH.mu(T) + (F_B/F_T)*O2.mu(T) + (F_C/F_T)*HCHO.mu(T) + (F_D/F_T)*H2O.mu(T) + (F_E/F_T)*CO.mu(T) + (F_F/F_T)*DME.mu(T) + (F_G/F_T)*DMM.mu(T) + (F_I/F_T)*N2.mu(T)
 
 
 def A_c(r):
@@ -35,6 +43,36 @@ def B_0(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
     return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*mu(T, 6.5592E-07, 0.6081 , 54.714))/d_p) + 1.75*G(F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0, P_0, T_0, r)))
 
 
+def Re(rho, mu, U, dp):
+    return U*rho*dp/mu
+
+
+def Pr(mu, kappa, Cp):
+    return mu*Cp/kappa
+
+
+def Sc(rho, mu, D_eff):
+    return (mu/rho)/D_eff
+
+
+def Sh(rho, mu, U, dp, D_eff):
+    return 2 + 0.6*(Re(rho, mu, U, dp)**0.5)*(Sc(rho, mu, D_eff)**(1/3))
+
+
+def Nu(rho, mu, U, dp, kappa, Cp):
+    return 2 + 0.6*(Re(rho, mu, U, dp)**0.5)*(Pr(mu, kappa, Cp)**(1/3))
+
+
+def k_c(rho, mu, U, dp, D_eff):
+    return D_eff*Sh(rho, mu, U, dp, D_eff)/dp
+
+
+def h(rho, mu, U, dp, kappa, Cp):
+    return kappa*Nu(rho, mu, U, dp, kappa, Cp)/dp
+
+
 if __name__ == "__main__":
     # test things here
-    print(u(F_T0, P_0, T_0, r_inner))
+    print(1-porosity(2*r_inner, 2*r_part))
+    print(a_c(2*r_inner, 2*r_part), alpha)
+

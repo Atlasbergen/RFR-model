@@ -10,7 +10,7 @@ CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2 = [
     Molecule("Water", Mw_H2O, H_f_H2O, Tb_H2O, Vb_H2O, Param_Mu_H2O, Param_Cp_H2O, Param_kappa_H2O),
     Molecule("Carbon Monoxide", Mw_CO, H_f_CO, Tb_CO, Vb_CO, Param_Mu_CO, Param_Cp_CO, Param_kappa_CO),
     Molecule("DME", Mw_DME, H_f_DME, Tb_DME, Vb_DME, Param_Mu_DME, Param_Cp_DME, Param_kappa_DME),
-    Molecule("DMM", Mw_DMM, H_f_DMM, Tb_DMM, Vb_DMM, [0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]),
+    Molecule("DMM", Mw_DMM, H_f_DMM, Tb_DMM, Vb_DMM, Param_Mu_DMM, [0, 0, 0, 0], Param_kappa_DMM),
     Molecule("Nitrogen", Mw_N2, H_f_N2, Tb_N2, Vb_N2, Param_Mu_N2, Param_Cp_N2, Param_kappa_N2),
 ]
 
@@ -24,12 +24,12 @@ r1, r2, r3, r4, r5 = [
 ]
 
 
-def mu_mix(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, F_T):
-    return (F_A/F_T)*CH3OH.mu(T, P) + (F_B/F_T)*O2.mu(T, P) + (F_C/F_T)*HCHO.mu(T, P) + (F_D/F_T)*H2O.mu(T, P) + (F_E/F_T)*CO.mu(T, P) + (F_F/F_T)*DME.mu(T, P) + (F_G/F_T)*DMM.mu(T, P) + (F_I/F_T)*N2.mu(T, P)
+def mu_mix(T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, F_T):
+    return (F_A/F_T)*CH3OH.mu(T) + (F_B/F_T)*O2.mu(T) + (F_C/F_T)*HCHO.mu(T) + (F_D/F_T)*H2O.mu(T) + (F_E/F_T)*CO.mu(T) + (F_F/F_T)*DME.mu(T) + (F_G/F_T)*DMM.mu(T) + (F_I/F_T)*N2.mu(T)
 
 
 def B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
-    return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*mu_mix(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, F_T))/d_p) + 1.75*G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)))
+    return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*mu_mix(T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, F_T))/d_p) + 1.75*G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)))
 
 
 def dFdw(w, F):
@@ -95,3 +95,4 @@ ax3.grid(color='0.8')
 plt.show()
 
 print((Y_A[0]-Y_A[-1])/Y_A[0])
+print(Y_B)

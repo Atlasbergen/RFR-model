@@ -62,7 +62,7 @@ Param_Cp_Me, Param_Cp_O2, Param_Cp_H2O, Param_Cp_HCHO, Param_Cp_CO, Param_Cp_DME
     [0.29105e5, 0.08615e5, 1.70160e3, 0.00103e5, 909.79],
 ]
 
-Param_Mu_Me, Param_Mu_O2, Param_Mu_H2O, Param_Mu_HCHO, Param_Mu_CO, Param_Mu_DME, Param_Mu_N2 = [
+Param_Mu_Me, Param_Mu_O2, Param_Mu_H2O, Param_Mu_HCHO, Param_Mu_CO, Param_Mu_DME, Param_Mu_N2, Param_Mu_DMM = [
     [3.0663e-7, 0.69655, 205],
     [1.1010e-6, 0.5634, 96.3],
     [1.7096e-8, 1.1146, 0],
@@ -70,9 +70,10 @@ Param_Mu_Me, Param_Mu_O2, Param_Mu_H2O, Param_Mu_HCHO, Param_Mu_CO, Param_Mu_DME
     [1.1127e-6, 0.5338, 94.7],
     [2.6800e-6, 0.3975, 534],
     [6.5592e-7, 0.6081, 54.714],
+    [1.9344, 3.2209e-1, -6.6278e-6, -1.9285e-8]
 ]
 
-Param_kappa_Me, Param_kappa_O2, Param_kappa_H2O, Param_kappa_HCHO, Param_kappa_CO, Param_kappa_DME, Param_kappa_N2 = [
+Param_kappa_Me, Param_kappa_O2, Param_kappa_H2O, Param_kappa_HCHO, Param_kappa_CO, Param_kappa_DME, Param_kappa_N2, Param_kappa_DMM = [
     [5.7992e-7, 1.7862, 0, 0],
     [0.00044994, 0.7456, 56.699, 0],
     [6.2041e-6, 1.3973, 0, 0],
@@ -80,4 +81,5 @@ Param_kappa_Me, Param_kappa_O2, Param_kappa_H2O, Param_kappa_HCHO, Param_kappa_C
     [0.00059882, 0.6863, 57.13, 501.92],
     [0.059975, 0.2667, 1018.6, 1098800],
     [0.00033143, 0.7722, 16.323, 373.72],
+    [-2.7748e-3, 2.9488e-5, 1.1508e-7, -4.5122e-11]
 ]

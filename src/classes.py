@@ -4,6 +4,10 @@ import numpy as np
 R = 8.314
 
 
+def phi_ij(n_i, n_j, M_wi, M_wj):  # Properties of gases and liquids
+    return (1 + ((n_i/n_j)**0.5)*((M_wj/M_wi)**0.25))**2 / (8*(1 + (M_wi/M_wj)))**0.5
+
+
 class Molecule:
 
     def __init__(self, name: str, M_w: float, H_f: float, T_boil: float, Vb: float, params_vis: list, params_cp: list, params_kappa: list):
@@ -15,6 +19,29 @@ class Molecule:
         self.params_vis = params_vis
         self.params_cp = params_cp
         self.params_kappa = params_kappa
+
+    @staticmethod
+    def mu_gas_mix(T, F_T, Mol_flows, Molecules):  # Properties of gases and liquids
+        comb = list(zip(Mol_flows, Molecules))
+        sum = 0
+
+        for i, j in enumerate(comb):
+            numerator = (j[0]/F_T)*j[1].mu(T)
+            denom = 0
+            for k, m in enumerate(comb):
+                denom += (m[0]/F_T)*phi_ij(j[1].mu(T), m[1].mu(T), j[1].M_w, m[1].M_w)
+            sum += numerator/denom
+
+        return sum
+
+    @staticmethod
+    def kappa_gas_mix(T, F_T, Mol_flows, Molecules):  # Motivation from Properties of gases and liquids
+        comb = list(zip(Mol_flows, Molecules))
+        sum = 0
+        for i in comb:
+            sum += (i[0]/F_T) * i[1].kappa(T)
+
+        return sum
 
     @staticmethod
     def char_len(V_a: float, V_b: float) -> float:  # properties of gases and liquids 11-3, 11-4
@@ -30,14 +57,11 @@ class Molecule:
 
     @staticmethod
     def D_AB(T: float, P: float, T_a: float, T_b: float, V_a: float, V_b: float, M_wa: float, M_wb: float) -> float:  # properties of gases and liquids 11-3, 11-4
-        return (3.03-(0.98/(2/((1/M_wa)+(1/M_wb))**0.5)))*(T**(3/2))*e-7/((2/((1/M_wa)+(1/M_wb))**0.5)*P*(Molecule.charm_len(V_a, V_b)**2)*Molecule.collision_integral(T, T_a, T_b))
+        return (3.03-(0.98/(2*((1/M_wa)+(1/M_wb))**-1)**0.5))*(T**(3/2))*1e-7/(((2*((1/M_wa)+(1/M_wb))**-1)**0.5)*P*(Molecule.char_len(V_a, V_b)**2)*Molecule.collision_integral(T, T_a, T_b))
 
-    def mu(self, T: float, P: float) -> float:
+    def mu(self, T: float) -> float:
         if self.name == "DMM":
-            X = 2.12574 + 2063.71/(T*1.8) + 0.00119260*self.M_w
-            K = (16.7175+0.0419188*self.M_w)*((T*1.8)**1.40256)/(212.209 + 18.1349*self.M_w + T*1.8)
-            Y = 2.447 + 0.0392851*X
-            return 1e-7*K*np.exp(X * self.rho(P*101325*1e-6, T)**Y)  # from article by O. Jeje and L. Mattar
+            return (self.params_vis[0] + self.params_vis[1]*T + self.params_vis[2]*T**2 + self.params_vis[3]*T**3)*1e-7   # from Transport properties of hydrocarbons
         else:
             return self.params_vis[0]*(T**self.params_vis[1])/(1 + (self.params_vis[2]/T))  # from perry 2-267
 
@@ -50,8 +74,23 @@ class Molecule:
         else:
             return (self.params_cp[0] + (self.params_cp[1]*(self.params_cp[2]/(T*np.sinh(self.params_cp[2]/T)))**2) + (self.params_cp[3]*(self.params_cp[4]/(T*np.cosh(self.params_cp[4]/T)))**2))*1e-3  # from perry 2-149
 
-    def kappa(self, T):  # perry 2-289
-        return self.params_kappa[0]*T**self.params_kappa[1] / (1 + (self.params_kappa[2]/T) + (self.params_kappa[3]/T**2))
+    def kappa(self, T):  # perry 2-289 & Transport properties of hydrocarbons
+        if self.name == "DMM":
+            return self.params_kappa[0] + self.params_kappa[1]*T + self.params_kappa[2]*T**2 + self.params_kappa[3]*T**3
+        else:
+            return self.params_kappa[0]*T**self.params_kappa[1] / (1 + (self.params_kappa[2]/T) + (self.params_kappa[3]/T**2))
+
+    def D_eff(self, T, P, F_T, F_main, Mol_flows, Molecules):
+        comb = list(zip(Mol_flows, Molecules))
+        denom = 0
+        numerator = 1 - (F_main/F_T)
+        for i in comb:
+            denom += (i[0]/F_T)/Molecule.D_AB(T, P, self.T_boil, i[1].T_boil, self.Vb, i[1].Vb, self.M_w, i[1].M_w)
+        # sum = 0
+        # for i in comb:
+        #     sum += (i[0]/F_T) / Molecule.D_AB(T, P, self.T_boil, i[1].T_boil, self.Vb, i[1].Vb, self.M_w, i[1].M_w)
+
+        return numerator / denom  # (sum)**-1
 
 
 class Reaction:
