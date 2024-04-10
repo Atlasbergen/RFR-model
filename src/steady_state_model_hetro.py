@@ -46,23 +46,55 @@ def f(df, f, p, t):
     return df
 
 
+def condition(out, u, t, integrator):
+    out[0] = u[0]
+    out[1] = u[1]
+    out[2] = u[2]
+    out[3] = u[3]
+    out[4] = u[4]
+    out[5] = u[5]
+    out[6] = u[6]
+    out[7] = u[7]
+    return out
+
+
+def affect_b(integrator, idx):
+    if idx == 1:
+        integrator.u[0] = 0
+    elif idx == 2:
+        integrator.u[1] = 0
+    elif idx == 3:
+        integrator.u[2] = 0
+    elif idx == 4:
+        integrator.u[3] = 0
+    elif idx == 5:
+        integrator.u[4] = 0
+    elif idx == 6:
+        integrator.u[5] = 0
+    elif idx == 7:
+        integrator.u[6] = 0
+    elif idx == 8:
+        integrator.u[7] = 0
+
+
+cb = de.VectorContinuousCallback(condition, affect_b, 8)
+
 f0 = [F_A0, F_B0, F_C0, F_D0, 0, 0, 0, 0]
 
 M = mass_mat(8, 4)
+z_span = (0, 1)
 
-z_span = (0, 3)
-# diff_vars = [True, True, True, True, False, False, False, False]
-# prob = de.DAEProblem(f, df0, f0, z_span, differential_vars=diff_vars)
-# sol = de.solve(prob, de.ARKODE(), saveat=0.0001)
 
 my_func = de.ODEFunction(f, mass_matrix = M)
 prob_mm = de.ODEProblem(my_func, f0, z_span)
-sol = de.solve(prob_mm, de.Rodas5(autodiff=False), saveat=0.001)
+sol = de.solve(prob_mm, de.Rodas5P(autodiff=False), callback=cb, saveat=0.001, reltol=1e-8, abstol=1e-8)
 
 z = sol.t
 u_vals = np.array([sol(i) for i in z]).T
 
 
-plt.plot(z, u_vals[0], z, u_vals[1], z, u_vals[2], z, u_vals[3])
+plt.plot(z, u_vals[4], z, u_vals[5], z, u_vals[6], z, u_vals[7])
 plt.show()
 print(sol(z[-1]))
+print(sol(z[0]))
+print([C_A0, C_B0, C_C0, C_D0])
