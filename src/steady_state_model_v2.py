@@ -33,16 +33,16 @@ def dFdw(F, p, t):
     F_T = F_A + F_B + F_C + F_D + F_E + F_F + F_G + F_I
 
     return [
-        -(r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + 2*r3.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + 2*r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)),
-        -0.5*(r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)),
-        (r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)) - (r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)),
-        r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r3.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) + r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T),
-        r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T),
-        r3.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T) - 0.5*r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T),
-        r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T),
+        -(r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + 2*r3.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + 2*r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))),
+        -0.5*(r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))),
+        (r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))) - (r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))),
+        r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r3.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)),
+        r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)),
+        r3.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) - 0.5*r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)),
+        r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)),
         0,
-        -(B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r_inner, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*(F_T/F_T0)*0.0000098692,
-        ((-r1.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r1.H_rxn(T))+(-r2.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r2.H_rxn(T))+(-r3.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r3.H_rxn(T))+(-r4.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r4.H_rxn(T))+(-r5.r(T, P, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_T)*r5.H_rxn(T)))/(F_A*CH3OH.Cp(T) + F_B*O2.Cp(T) + F_C*HCHO.Cp(T) + F_D*H2O.Cp(T) + F_E*CO.Cp(T) + F_F*DME.Cp(T) + F_G*DMM.Cp(T) + F_I*N2.Cp(T)),
+        -(B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r_inner, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*(F_T/F_T0),
+        ((-r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r1.H_rxn(T))+(-r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r2.H_rxn(T))+(-r3.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r3.H_rxn(T))+(-r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r4.H_rxn(T))+(-r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r5.H_rxn(T)))/(F_A*CH3OH.Cp(T) + F_B*O2.Cp(T) + F_C*HCHO.Cp(T) + F_D*H2O.Cp(T) + F_E*CO.Cp(T) + F_F*DME.Cp(T) + F_G*DMM.Cp(T) + F_I*N2.Cp(T)),
     ]
 
 
@@ -114,11 +114,11 @@ ax1.set_ylabel("F [mol/s]")
 ax1.legend([r"$F_{CH_3OH}$", r"$F_{O_2}$", r"$F_{HCHO}$", r"$F_{H_2O}$", r"$F_{CO}$", r"$F_{DME}$", r"$F_{DMM}$"], loc="center left")
 ax1.grid(color='0.8')
 
-ax2.plot(w, (P_0-np.array(Y_P)), linewidth=0.9)
+ax2.plot(w, (P_0-np.array(Y_P))/P_0, linewidth=0.9)
 ax2.tick_params(axis="both",direction="in")
 ax2.spines[["top", "right"]].set_visible(False)
 ax2.set_xlabel("catalyst weight, W [kg]")
-ax2.set_ylabel("Pressure drop [atm]")
+ax2.set_ylabel("Pressure drop [%]")
 ax2.grid(color='0.8')
 
 ax3.plot(w, Y_T, linewidth=0.9)

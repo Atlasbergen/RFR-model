@@ -6,6 +6,8 @@ alpha = sa_cat*rho_cat  # [m⁻¹]
 w_cat = 1.1  # [kg]
 r_part = 150e-6  # [m]
 T_0 = 260 + 273.15  # [K]
+P_0 = 101325  # [Pa]
+
 F_A0 = 1  # [mol/s]
 F_B0 = 1  # [mol/S]
 F_C0 = 0  # [mol/s]
@@ -15,7 +17,17 @@ F_F0 = 0  # [mol/s]
 F_G0 = 0  # [mol/s]
 F_I0 = 8  # [mol/s]
 F_T0 = F_A0 + F_B0 + F_I0
-P_0 = 1  # [atm]
+
+C_A0 = F_A0 / (F_T0*R*T_0/P_0)  # [mol/m³]
+C_B0 = F_B0 / (F_T0*R*T_0/P_0)  # [mol/m³]
+C_C0 = 0  # [mol/m³]
+C_D0 = 0  # [mol/m³]
+C_E0 = 0  # [mol/m³]
+C_F0 = 0  # [mol/m³]
+C_G0 = 0  # [mol/m³]
+C_I0 = F_I0 / (F_T0*R*T_0/P_0)  # [mol/m³]
+C_T0 = C_A0 + C_B0 + C_I0
+
 
 # Data from deshmuk
 A_CH3OH = 2.6e-4  # [atm^-1]

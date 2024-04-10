@@ -29,10 +29,40 @@ def B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
     return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*Molecule.mu_gas_mix(T, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]))/d_p) + 1.75*G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)))
 
 
-def f(du, u, p, t):
-    C_A, C_B, C_C, C_D, C_As, C_Bs, C_Cs, C_Ds = u
-    resid1 = k_c()*a_c()*(C_As - C_A)
-    resid2 = k_c()*a_c()*(C_Bs - C_B)
-    resid3 = k_c()*a_c()*(C_Cs - C_C)
-    resid4 = k_c()*a_c()*(C_Ds - C_D)
-    return None
+def f(df, f, p, t):
+    F_A, F_B, F_C, F_D, C_As, C_Bs, C_Cs, C_Ds = f
+    F_T = F_A + F_B + F_C + F_D + F_I0
+
+    df[0] = k_c(rho_mix(T_0, P_0, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0), Molecule.mu_gas_mix(T_0, F_T, [F_A, F_B, F_C, F_D, F_I0], [CH3OH, O2, HCHO, H2O, N2]), u(F_T, P_0, T_0, r_inner), 2*r_part, CH3OH.D_eff(T_0, P_0, F_T, F_A, [F_B, F_C, F_D, F_I0], [O2, HCHO, H2O, N2]))*a_c(2*r_inner, 2*r_part)*A_c(r_inner)*(C_As - C(F_A, F_T, P_0, T_0))
+    df[1] = k_c(rho_mix(T_0, P_0, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0), Molecule.mu_gas_mix(T_0, F_T, [F_A, F_B, F_C, F_D, F_I0], [CH3OH, O2, HCHO, H2O, N2]), u(F_T, P_0, T_0, r_inner), 2*r_part, O2.D_eff(T_0, P_0, F_T, F_B, [F_A, F_C, F_D, F_I0], [CH3OH, HCHO, H2O, N2]))*a_c(2*r_inner, 2*r_part)*A_c(r_inner)*(C_Bs - C(F_B, F_T, P_0, T_0))
+    df[2] = k_c(rho_mix(T_0, P_0, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0), Molecule.mu_gas_mix(T_0, F_T, [F_A, F_B, F_C, F_D, F_I0], [CH3OH, O2, HCHO, H2O, N2]), u(F_T, P_0, T_0, r_inner), 2*r_part, HCHO.D_eff(T_0, P_0, F_T, F_C, [F_B, F_A, F_D, F_I0], [O2, CH3OH, H2O, N2]))*a_c(2*r_inner, 2*r_part)*A_c(r_inner)*(C_Cs - C(F_C, F_T, P_0, T_0))
+    df[3] = k_c(rho_mix(T_0, P_0, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0), Molecule.mu_gas_mix(T_0, F_T, [F_A, F_B, F_C, F_D, F_I0], [CH3OH, O2, HCHO, H2O, N2]), u(F_T, P_0, T_0, r_inner), 2*r_part, H2O.D_eff(T_0, P_0, F_T, F_D, [F_B, F_C, F_A, F_I0], [O2, HCHO, CH3OH, N2]))*a_c(2*r_inner, 2*r_part)*A_c(r_inner)*(C_Ds - C(F_D, F_T, P_0, T_0))
+
+    df[4] = k_c(rho_mix(T_0, P_0, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0), Molecule.mu_gas_mix(T_0, F_T, [F_A, F_B, F_C, F_D, F_I0], [CH3OH, O2, HCHO, H2O, N2]), u(F_T, P_0, T_0, r_inner), 2*r_part, CH3OH.D_eff(T_0, P_0, F_T, F_A, [F_B, F_C, F_D, F_I0], [O2, HCHO, H2O, N2]))*a_c(2*r_inner, 2*r_part)*(C(F_A, F_T, P_0, T_0) - C_As) + (-rho_cat*r1.r(T_0, C_As, C_Bs, C_Cs, C_Ds, 0, 0, 0))
+    df[5] = k_c(rho_mix(T_0, P_0, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0), Molecule.mu_gas_mix(T_0, F_T, [F_A, F_B, F_C, F_D, F_I0], [CH3OH, O2, HCHO, H2O, N2]), u(F_T, P_0, T_0, r_inner), 2*r_part, O2.D_eff(T_0, P_0, F_T, F_B, [F_A, F_C, F_D, F_I0], [CH3OH, HCHO, H2O, N2]))*a_c(2*r_inner, 2*r_part)*(C(F_B, F_T, P_0, T_0) - C_Bs) + (-rho_cat*r1.r(T_0, C_As, C_Bs, C_Cs, C_Ds, 0, 0, 0))
+    df[6] = k_c(rho_mix(T_0, P_0, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0), Molecule.mu_gas_mix(T_0, F_T, [F_A, F_B, F_C, F_D, F_I0], [CH3OH, O2, HCHO, H2O, N2]), u(F_T, P_0, T_0, r_inner), 2*r_part, HCHO.D_eff(T_0, P_0, F_T, F_C, [F_B, F_A, F_D, F_I0], [O2, CH3OH, H2O, N2]))*a_c(2*r_inner, 2*r_part)*(C(F_C, F_T, P_0, T_0) - C_Cs) + (rho_cat*r1.r(T_0, C_As, C_Bs, C_Cs, C_Ds, 0, 0, 0))
+    df[7] = k_c(rho_mix(T_0, P_0, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0), Molecule.mu_gas_mix(T_0, F_T, [F_A, F_B, F_C, F_D, F_I0], [CH3OH, O2, HCHO, H2O, N2]), u(F_T, P_0, T_0, r_inner), 2*r_part, H2O.D_eff(T_0, P_0, F_T, F_D, [F_B, F_C, F_A, F_I0], [O2, HCHO, CH3OH, N2]))*a_c(2*r_inner, 2*r_part)*(C(F_D, F_T, P_0, T_0) - C_Ds) + (rho_cat*r1.r(T_0, C_As, C_Bs, C_Cs, C_Ds, 0, 0, 0))
+
+    return df
+
+
+f0 = [F_A0, F_B0, F_C0, F_D0, 0, 0, 0, 0]
+
+M = mass_mat(8, 4)
+
+z_span = (0, 3)
+# diff_vars = [True, True, True, True, False, False, False, False]
+# prob = de.DAEProblem(f, df0, f0, z_span, differential_vars=diff_vars)
+# sol = de.solve(prob, de.ARKODE(), saveat=0.0001)
+
+my_func = de.ODEFunction(f, mass_matrix = M)
+prob_mm = de.ODEProblem(my_func, f0, z_span)
+sol = de.solve(prob_mm, de.Rodas5(autodiff=False), saveat=0.001)
+
+z = sol.t
+u_vals = np.array([sol(i) for i in z]).T
+
+
+plt.plot(z, u_vals[0], z, u_vals[1], z, u_vals[2], z, u_vals[3])
+plt.show()
+print(sol(z[-1]))
