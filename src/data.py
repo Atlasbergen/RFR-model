@@ -3,9 +3,9 @@ r_inner = 0.25  # [m]
 rho_cat = 1000  # [kg/m³]
 sa_cat = 6e-3  # [m²/kg]
 alpha = sa_cat*rho_cat  # [m⁻¹]
-w_cat = 1.1  # [kg]
+w_cat = 6  # [kg]
 r_part = 150e-6  # [m]
-T_0 = 260 + 273.15  # [K]
+T_0 = 280 + 273.15  # [K]
 P_0 = 101325  # [Pa]
 
 F_A0 = 1  # [mol/s]
@@ -28,6 +28,13 @@ C_G0 = 0  # [mol/m³]
 C_I0 = F_I0 / (F_T0*R*T_0/P_0)  # [mol/m³]
 C_T0 = C_A0 + C_B0 + C_I0
 
+C_As0 = 1e-100  # [mol/m³]
+C_Bs0 = 0  # [mol/m³]  
+C_Cs0 = 0  # [mol/m³]  
+C_Ds0 = 0  # [mol/m³]  
+C_Es0 = 0  # [mol/m³]  
+C_Fs0 = 0  # [mol/m³]  
+C_Gs0 = 0  # [mol/m³] 
 
 # Data from deshmuk
 A_CH3OH = 2.6e-4  # [atm^-1]

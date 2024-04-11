@@ -54,7 +54,7 @@ def condition(out, u, t, integrator):
     out[4] = u[4]
     out[5] = u[5]
     out[6] = u[6]
-    out[8] = u[8]
+    out[8] = u[8] - 1000
     out[9] = u[9] - 673.15
     return out
 
@@ -114,7 +114,7 @@ ax1.set_ylabel("F [mol/s]")
 ax1.legend([r"$F_{CH_3OH}$", r"$F_{O_2}$", r"$F_{HCHO}$", r"$F_{H_2O}$", r"$F_{CO}$", r"$F_{DME}$", r"$F_{DMM}$"], loc="center left")
 ax1.grid(color='0.8')
 
-ax2.plot(w, (P_0-np.array(Y_P))/P_0, linewidth=0.9)
+ax2.plot(w, (P_0-np.array(Y_P))*1e2/P_0, linewidth=0.9)
 ax2.tick_params(axis="both",direction="in")
 ax2.spines[["top", "right"]].set_visible(False)
 ax2.set_xlabel("catalyst weight, W [kg]")
