@@ -380,9 +380,9 @@ sol = de.solve(
     prob_mm,
     de.Rodas5P(autodiff=False),
     callback=cb,
-    saveat=0.01,
-    reltol=1e-8,
-    abstol=1e-8,
+    saveat=0.001,
+    reltol=1e-6,
+    abstol=1e-6,
 )
 
 z = sol.t
@@ -444,6 +444,8 @@ plt.subplots_adjust(hspace=0.3)
 plt.show()
 
 
-print("Reactor entrance:", sol(z[0]))
-print("Reactor exit:", sol(z[-1]))
+print(f"\nReactor entrance:\nF_CH₃OH = {sol(z[0])[0]} mol/s\nF_O₂ = {sol(z[0])[1]} mol/s\nF_HCHO = {sol(z[0])[2]} mol/s\nF_H₂O = {sol(z[0])[3]} mol/s\nF_CO = {sol(z[0])[4]} mol/s\nF_DME = {sol(z[0])[5]} mol/s\nF_DMM = {sol(z[0])[6]} mol/s\nCs_CH₃OH = {sol(z[0])[8]} mol/s\nCs_O₂ = {sol(z[0])[9]} mol/s\nCs_HCHO = {sol(z[0])[10]} mol/s\nCs_H₂O = {sol(z[0])[11]} mol/s\nCs_CO = {sol(z[0])[12]} mol/s\nCs_DME = {sol(z[0])[13]} mol/s\nCs_DMM = {sol(z[0])[14]} mol/s\nP = {sol(z[0])[7]} Pa\nT = {T_0} K\n")
+
+print(f"\nReactor exit:\nF_CH₃OH = {sol(z[-1])[0]} mol/s\nF_O₂ = {sol(z[-1])[1]} mol/s\nF_HCHO = {sol(z[-1])[2]} mol/s\nF_H₂O = {sol(z[-1])[3]} mol/s\nF_CO = {sol(z[-1])[4]} mol/s\nF_DME = {sol(z[-1])[5]} mol/s\nF_DMM = {sol(z[-1])[6]} mol/s\nCs_CH₃OH = {sol(z[-1])[8]} mol/s\nCs_O₂ = {sol(z[-1])[9]} mol/s\nCs_HCHO = {sol(z[-1])[10]} mol/s\nCs_H₂O = {sol(z[-1])[11]} mol/s\nCs_CO = {sol(z[-1])[12]} mol/s\nCs_DME = {sol(z[-1])[13]} mol/s\nCs_DMM = {sol(z[-1])[14]} mol/s\nP = {sol(z[-1])[7]} Pa\nT = {T_0} K\n")
+
 print(f"Conversion of Methanol: {(u_A[0]-u_A[-1])*1e2/u_A[0]}%")

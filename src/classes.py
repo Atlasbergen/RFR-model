@@ -57,7 +57,7 @@ class Molecule:
 
     @staticmethod
     def D_AB(T: float, P: float, T_a: float, T_b: float, V_a: float, V_b: float, M_wa: float, M_wb: float) -> float:  # properties of gases and liquids 11-3, 11-4
-        return (3.03-(0.98/(2*((1/M_wa)+(1/M_wb))**-1)**0.5))*(T**(3/2))*1e-7/(((2*((1/M_wa)+(1/M_wb))**-1)**0.5)*P*(Molecule.char_len(V_a, V_b)**2)*Molecule.collision_integral(T, T_a, T_b))
+        return (3.03-(0.98/(2*((1/M_wa)+(1/M_wb))**-1)**0.5))*(T**(3/2))*1e-7/(((2*((1/M_wa)+(1/M_wb))**-1)**0.5)*(P/101325)*(Molecule.char_len(V_a, V_b)**2)*Molecule.collision_integral(T, T_a, T_b))
 
     def mu(self, T: float) -> float:
         if self.name == "DMM":

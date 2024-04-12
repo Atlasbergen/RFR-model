@@ -61,7 +61,7 @@ def condition(out, u, t, integrator):
 
 def affect_b(integrator, idx):
     if idx == 1:
-        integrator.u[0] = 0
+        de.terminate_b(integrator)
     elif idx == 2:
         integrator.u[1] = 0
     elif idx == 3:
@@ -130,5 +130,8 @@ ax3.grid(color='0.8')
 
 plt.show()
 
-print((Y_A[0]-Y_A[-1])/Y_A[0])
-print(sol(w[-1]))
+print(f"\nReactor entrance:\nF_CH₃OH = {sol(w[0])[0]} mol/s\nF_O₂ = {sol(w[0])[1]} mol/s\nF_HCHO = {sol(w[0])[2]} mol/s\nF_H₂O = {sol(w[0])[3]} mol/s\nF_CO = {sol(w[0])[4]} mol/s\nF_DME = {sol(w[0])[5]} mol/s\nF_DMM = {sol(w[0])[6]} mol/s\nP = {sol(w[0])[8]} Pa\nT = {sol(w[0])[9]} K\n")
+
+print(f"\nReactor exit:\nF_CH₃OH = {sol(w[-1])[0]} mol/s\nF_O₂ = {sol(w[-1])[1]} mol/s\nF_HCHO = {sol(w[-1])[2]} mol/s\nF_H₂O = {sol(w[-1])[3]} mol/s\nF_CO = {sol(w[-1])[4]} mol/s\nF_DME = {sol(w[-1])[5]} mol/s\nF_DMM = {sol(w[-1])[6]} mol/s\nP = {sol(w[-1])[8]} Pa\nT = {sol(w[-1])[9]} K\n")
+
+print(f"Conversion of Methanol: {(Y_A[0]-Y_A[-1])*1e2/Y_A[0]}%")
