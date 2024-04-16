@@ -26,6 +26,14 @@ def u(F_T, P, T, r):
     return q_dot(F_T, P, T) / (3.14*(r**2))
 
 
+def u_2(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I):
+    return u_0 * rho_mix(T_0, P_0, C_T0, C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, C_I0) / rho_mix(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)
+
+
+def q_dot_2(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I):
+    return vel(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)*A_c(r_inner)
+
+
 def G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r):
     return rho_mix(T, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I)*u(F_T, P, T, r)
 

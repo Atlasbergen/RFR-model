@@ -129,186 +129,222 @@ def B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
 
 
 def f(df, f, p, t):
-    F_A, F_B, F_C, F_D, F_E, F_F, F_G, P, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs = f
+    F_A, F_B, F_C, F_D, F_E, F_F, F_G, P, T_f, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs, T_s = f
     F_T = F_A + F_B + F_C + F_D + F_E + F_F + F_G + F_I0
 
     df[0] = (
         k_c(
-            rho_mix(T_0, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
+            rho_mix(T_f, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
             Molecule.mu_gas_mix(
-                T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
             ),
-            u(F_T, P, T_0, r_inner),
+            u(F_T, P, T_f, r_inner),
             2 * r_part,
-            CH3OH.D_eff(T_0, P, F_T, F_A, [F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [O2, HCHO, H2O, CO, DME, DMM, N2]),
+            CH3OH.D_eff(T_f, P, F_T, F_A, [F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [O2, HCHO, H2O, CO, DME, DMM, N2]),
         )
         * a_c(2 * r_inner, 2 * r_part)
         * A_c(r_inner)
-        * (C_As - C(F_A, F_T, P, T_0))
+        * (C_As - C(F_A, F_T, P, T_f))
     )
     df[1] = (
         k_c(
-            rho_mix(T_0, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
+            rho_mix(T_f, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
             Molecule.mu_gas_mix(
-                T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
             ),
-            u(F_T, P, T_0, r_inner),
+            u(F_T, P, T_f, r_inner),
             2 * r_part,
-            O2.D_eff(T_0, P, F_T, F_B, [F_A, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, HCHO, H2O, CO, DME, DMM, N2]),
+            O2.D_eff(T_f, P, F_T, F_B, [F_A, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, HCHO, H2O, CO, DME, DMM, N2]),
         )
         * a_c(2 * r_inner, 2 * r_part)
         * A_c(r_inner)
-        * (C_Bs - C(F_B, F_T, P, T_0))
+        * (C_Bs - C(F_B, F_T, P, T_f))
     )
     df[2] = (
         k_c(
-            rho_mix(T_0, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
+            rho_mix(T_f, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
             Molecule.mu_gas_mix(
-                T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
             ),
-            u(F_T, P, T_0, r_inner),
+            u(F_T, P, T_f, r_inner),
             2 * r_part,
-            HCHO.D_eff(T_0, P, F_T, F_C, [F_B, F_A, F_D, F_E, F_F, F_G, F_I0], [O2, CH3OH, H2O, CO, DME, DMM, N2]),
+            HCHO.D_eff(T_f, P, F_T, F_C, [F_B, F_A, F_D, F_E, F_F, F_G, F_I0], [O2, CH3OH, H2O, CO, DME, DMM, N2]),
         )
         * a_c(2 * r_inner, 2 * r_part)
         * A_c(r_inner)
-        * (C_Cs - C(F_C, F_T, P, T_0))
+        * (C_Cs - C(F_C, F_T, P, T_f))
     )
     df[3] = (
         k_c(
-            rho_mix(T_0, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
+            rho_mix(T_f, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
             Molecule.mu_gas_mix(
-                T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
             ),
-            u(F_T, P, T_0, r_inner),
+            u(F_T, P, T_f, r_inner),
             2 * r_part,
-            H2O.D_eff(T_0, P, F_T, F_D, [F_B, F_C, F_A, F_E, F_F, F_G, F_I0], [O2, HCHO, CH3OH, CO, DME, DMM, N2]),
+            H2O.D_eff(T_f, P, F_T, F_D, [F_B, F_C, F_A, F_E, F_F, F_G, F_I0], [O2, HCHO, CH3OH, CO, DME, DMM, N2]),
         )
         * a_c(2 * r_inner, 2 * r_part)
         * A_c(r_inner)
-        * (C_Ds - C(F_D, F_T, P, T_0))
+        * (C_Ds - C(F_D, F_T, P, T_f))
     )
     df[4] = (
         k_c(
-            rho_mix(T_0, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
+            rho_mix(T_f, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
             Molecule.mu_gas_mix(
-                T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
             ),
-            u(F_T, P, T_0, r_inner),
+            u(F_T, P, T_f, r_inner),
             2 * r_part,
-            CO.D_eff(T_0, P, F_T, F_E, [F_B, F_C, F_D, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, DME, DMM, N2]),
+            CO.D_eff(T_f, P, F_T, F_E, [F_B, F_C, F_D, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, DME, DMM, N2]),
         )
         * a_c(2 * r_inner, 2 * r_part)
         * A_c(r_inner)
-        * (C_Es - C(F_E, F_T, P, T_0))
+        * (C_Es - C(F_E, F_T, P, T_f))
     )
     df[5] = (
         k_c(
-            rho_mix(T_0, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
+            rho_mix(T_f, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
             Molecule.mu_gas_mix(
-                T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
             ),
-            u(F_T, P, T_0, r_inner),
+            u(F_T, P, T_f, r_inner),
             2 * r_part,
-            DME.D_eff(T_0, P, F_T, F_F, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2]),
+            DME.D_eff(T_f, P, F_T, F_F, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2]),
         )
         * a_c(2 * r_inner, 2 * r_part)
         * A_c(r_inner)
-        * (C_Fs - C(F_F, F_T, P, T_0))
+        * (C_Fs - C(F_F, F_T, P, T_f))
     )
     df[6] = (
         k_c(
-            rho_mix(T_0, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
+            rho_mix(T_f, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
             Molecule.mu_gas_mix(
-                T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
             ),
-            u(F_T, P, T_0, r_inner),
+            u(F_T, P, T_f, r_inner),
             2 * r_part,
-            DMM.D_eff(T_0, P, F_T, F_G, [F_B, F_C, F_D, F_E, F_F, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, N2]),
+            DMM.D_eff(T_f, P, F_T, F_G, [F_B, F_C, F_D, F_E, F_F, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, N2]),
         )
         * a_c(2 * r_inner, 2 * r_part)
         * A_c(r_inner)
-        * (C_Gs - C(F_G, F_T, P, T_0))
+        * (C_Gs - C(F_G, F_T, P, T_f))
     )
     
-    df[7] = -B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0, P, T_0, r_inner, 2*r_inner, 2*r_part)*(T_0/T_0)*(P_0/P)*(F_T/F_T0)
-
-    df[8] = k_c(
-        rho_mix(T_0, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
-        Molecule.mu_gas_mix(
-            T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
-        ),
-        u(F_T, P, T_0, r_inner),
-        2 * r_part,
-        CH3OH.D_eff(T_0, P, F_T, F_A, [F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [O2, HCHO, H2O, CO, DME, DMM, N2]),
-    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_A, F_T, P, T_0) - C_As) - (
-        rho_cat * (r1.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + 2*r3.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + 2*r4.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
+    df[7] = -B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0, P, T_f, r_inner, 2*r_inner, 2*r_part)*(T_f/T_0)*(P_0/P)*(F_T/F_T0)
+    df[8] = (
+        h(
+            rho_mix(T_f, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
+            Molecule.mu_gas_mix(
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            ),
+            u(F_T, P, T_f, r_inner),
+            2*r_part,
+            Molecule.kappa_gas_mix(
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            ),
+            Molecule.Cp_gas_mix(
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            )
+        )
+        * a_c(2*r_inner, 2*r_part)
+        * (1/(u(F_T, P, T_f, r_inner)*(CH3OH.Cp(T_f)*C(F_A, F_T, P, T_f) + O2.Cp(T_f)*C(F_B, F_T, P, T_f) + HCHO.Cp(T_f)*C(F_C, F_T, P, T_f) + H2O.Cp(T_f)*C(F_D, F_T, P, T_f) + CO.Cp(T_f)*C(F_E, F_T, P, T_f) + DME.Cp(T_f)*C(F_F, F_T, P, T_f) + DMM.Cp(T_f)*C(F_G, F_T, P, T_f) + N2.Cp(T_f)*C(F_I0, F_T, P, T_f))))
+        * (T_s - T_f)
     )
+
     df[9] = k_c(
-        rho_mix(T_0, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
+        rho_mix(T_f, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
         Molecule.mu_gas_mix(
-            T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
         ),
-        u(F_T, P, T_0, r_inner),
+        u(F_T, P, T_f, r_inner),
         2 * r_part,
-        O2.D_eff(T_0, P, F_T, F_B, [F_A, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, HCHO, H2O, CO, DME, DMM, N2]),
-    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_B, F_T, P, T_0) - C_Bs) - (
-        0.5 * rho_cat * (r1.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r2.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r5.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
+        CH3OH.D_eff(T_f, P, F_T, F_A, [F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [O2, HCHO, H2O, CO, DME, DMM, N2]),
+    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_A, F_T, P, T_f) - C_As) - (
+        rho_cat * (1-porosity(2*r_inner, 2*r_part)) * (r1.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + 2*r3.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + 2*r4.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
     )
     df[10] = k_c(
-        rho_mix(T_0, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
+        rho_mix(T_f, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
         Molecule.mu_gas_mix(
-            T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
         ),
-        u(F_T, P, T_0, r_inner),
+        u(F_T, P, T_f, r_inner),
         2 * r_part,
-        HCHO.D_eff(T_0, P, F_T, F_C, [F_B, F_A, F_D, F_E, F_F, F_G, F_I0], [O2, CH3OH, H2O, CO, DME, DMM, N2]),
-    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_C, F_T, P, T_0) - C_Cs) + (
-        rho_cat * (r1.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r5.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) - r2.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) - r4.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
+        O2.D_eff(T_f, P, F_T, F_B, [F_A, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, HCHO, H2O, CO, DME, DMM, N2]),
+    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_B, F_T, P, T_f) - C_Bs) - (
+        0.5 * rho_cat * (1-porosity(2*r_inner, 2*r_part)) * (r1.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r2.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r5.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
     )
     df[11] = k_c(
-        rho_mix(T_0, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
+        rho_mix(T_f, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
         Molecule.mu_gas_mix(
-            T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
         ),
-        u(F_T, P, T_0, r_inner),
+        u(F_T, P, T_f, r_inner),
         2 * r_part,
-        H2O.D_eff(T_0, P, F_T, F_D, [F_B, F_C, F_A, F_E, F_F, F_G, F_I0], [O2, HCHO, CH3OH, CO, DME, DMM, N2]),
-    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_D, F_T, P, T_0) - C_Ds) + (
-        rho_cat * (r1.r(T_0, C_As, C_Bs, C_Cs, C_Ds, 0, 0, 0) + r2.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r3.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r4.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + 0.5*r5.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
+        HCHO.D_eff(T_f, P, F_T, F_C, [F_B, F_A, F_D, F_E, F_F, F_G, F_I0], [O2, CH3OH, H2O, CO, DME, DMM, N2]),
+    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_C, F_T, P, T_f) - C_Cs) + (
+        rho_cat * (1-porosity(2*r_inner, 2*r_part)) * (r1.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r5.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) - r2.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) - r4.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
     )
     df[12] = k_c(
-        rho_mix(T_0, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
+        rho_mix(T_f, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
         Molecule.mu_gas_mix(
-            T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
         ),
-        u(F_T, P, T_0, r_inner),
+        u(F_T, P, T_f, r_inner),
         2 * r_part,
-        CO.D_eff(T_0, P, F_T, F_E, [F_B, F_C, F_D, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, DME, DMM, N2]),
-    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_E, F_T, P, T_0) - C_Es) + (
-        rho_cat * r2.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs)
+        H2O.D_eff(T_f, P, F_T, F_D, [F_B, F_C, F_A, F_E, F_F, F_G, F_I0], [O2, HCHO, CH3OH, CO, DME, DMM, N2]),
+    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_D, F_T, P, T_f) - C_Ds) + (
+        rho_cat * (1-porosity(2*r_inner, 2*r_part)) * (r1.r(T_s, C_As, C_Bs, C_Cs, C_Ds, 0, 0, 0) + r2.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r3.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + r4.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) + 0.5*r5.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
     )
     df[13] = k_c(
-        rho_mix(T_0, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
+        rho_mix(T_f, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
         Molecule.mu_gas_mix(
-            T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
         ),
-        u(F_T, P, T_0, r_inner),
+        u(F_T, P, T_f, r_inner),
         2 * r_part,
-        DME.D_eff(T_0, P, F_T, F_F, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2]),
-    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_F, F_T, P, T_0) - C_Fs) + (
-        rho_cat * (r3.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) - 0.5*r2.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
+        CO.D_eff(T_f, P, F_T, F_E, [F_B, F_C, F_D, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, DME, DMM, N2]),
+    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_E, F_T, P, T_f) - C_Es) + (
+        rho_cat * (1-porosity(2*r_inner, 2*r_part)) * r2.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs)
     )
     df[14] = k_c(
-        rho_mix(T_0, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
+        rho_mix(T_f, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
         Molecule.mu_gas_mix(
-            T_0, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
         ),
-        u(F_T, P, T_0, r_inner),
+        u(F_T, P, T_f, r_inner),
         2 * r_part,
-        DMM.D_eff(T_0, P, F_T, F_G, [F_B, F_C, F_D, F_E, F_F, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, N2]),
-    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_G, F_T, P, T_0) - C_Gs) + (
-        rho_cat * r4.r(T_0, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs)
+        DME.D_eff(T_f, P, F_T, F_F, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2]),
+    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_F, F_T, P, T_f) - C_Fs) + (
+        rho_cat * (1-porosity(2*r_inner, 2*r_part)) * (r3.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs) - 0.5*r2.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs))
+    )
+    df[15] = k_c(
+        rho_mix(T_f, P, F_T, F_A, F_C, 0, 0, 0, F_D, F_B, F_I0),
+        Molecule.mu_gas_mix(
+            T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+        ),
+        u(F_T, P, T_f, r_inner),
+        2 * r_part,
+        DMM.D_eff(T_f, P, F_T, F_G, [F_B, F_C, F_D, F_E, F_F, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, N2]),
+    ) * a_c(2 * r_inner, 2 * r_part) * (C(F_G, F_T, P, T_f) - C_Gs) + (
+        rho_cat * (1-porosity(2*r_inner, 2*r_part)) * r4.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs)
+    )
+    df[16] = (
+        (h(
+            rho_mix(T_f, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0),
+            Molecule.mu_gas_mix(
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            ),
+            u(F_T, P, T_f, r_inner),
+            2*r_part,
+            Molecule.kappa_gas_mix(
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            ),
+            Molecule.Cp_gas_mix(
+                T_f, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
+            )
+        )
+        * a_c(2*r_inner, 2*r_part) * (T_f - T_s)) + ((1-porosity(2*r_inner, 2*r_part))*rho_cat*((-r1.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs)*r1.H_rxn(T_s)) + (-r2.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs)*r2.H_rxn(T_s)) + (-r3.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs)*r3.H_rxn(T_s)) + (-r4.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs)*r4.H_rxn(T_s)) + (-r5.r(T_s, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs)*r5.H_rxn(T_s))))
     )
 
     return df
@@ -323,13 +359,15 @@ def condition(out, u, t, integrator):
     out[5] = u[5]
     out[6] = u[6]
     out[7] = u[7] - 1000
-    out[8] = u[8]
+    out[8] = u[8]  # - 700
     out[9] = u[9]
     out[10] = u[10]
     out[11] = u[11]
     out[12] = u[12]
     out[13] = u[13]
     out[14] = u[14]
+    out[15] = u[15]
+    out[16] = u[16]
     return out
 
 
@@ -351,7 +389,7 @@ def affect_b(integrator, idx):
     elif idx == 8:
         de.terminate_b(integrator)
     elif idx == 9:
-        integrator.u[8] = 0
+        de.terminate_b(integrator)
     elif idx == 10:
         integrator.u[9] = 0
     elif idx == 11:
@@ -364,13 +402,17 @@ def affect_b(integrator, idx):
         integrator.u[13] = 0
     elif idx == 15:
         integrator.u[14] = 0
+    elif idx == 16:
+        integrator.u[15] = 0
+    elif idx == 17:
+        integrator.u[16] = 0
 
 
-cb = de.VectorContinuousCallback(condition, affect_b, 15)
+cb = de.VectorContinuousCallback(condition, affect_b, 17)
 
-f0 = [F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, P_0, C_As0, C_Bs0, C_Cs0, C_Ds0, C_Es0, C_Fs0, C_Gs0]
+f0 = [F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, P_0, T_0, C_As0, C_Bs0, C_Cs0, C_Ds0, C_Es0, C_Fs0, C_Gs0, T_0]
 
-M = mass_mat(15, 8)
+M = mass_mat(17, 9)
 z_span = (0, reactor_len(w_cat))
 
 
@@ -396,13 +438,15 @@ u_E = u_vals[4]
 u_F = u_vals[5]
 u_G = u_vals[6]
 u_P = u_vals[7]
-u_As = u_vals[8]
-u_Bs = u_vals[9]
-u_Cs = u_vals[10]
-u_Ds = u_vals[11]
-u_Es = u_vals[12]
-u_Fs = u_vals[13]
-u_Gs = u_vals[14]
+u_T = u_vals[8]
+u_As = u_vals[9]
+u_Bs = u_vals[10]
+u_Cs = u_vals[11]
+u_Ds = u_vals[12]
+u_Es = u_vals[13]
+u_Fs = u_vals[14]
+u_Gs = u_vals[15]
+u_Ts = u_vals[16]
 
 
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(20, 18))
@@ -432,11 +476,12 @@ ax3.set_xlabel("Reactor length, z [m]")
 ax3.set_ylabel(r"Pressure drop, $\Delta P$ [%]")
 ax3.grid(color='0.8')
 
-ax4.plot()
+ax4.plot(z, u_T, z, u_Ts, linewidth=0.8)
 ax4.tick_params(axis="both",direction="in")
 ax4.spines[["top", "right"]].set_visible(False)
 ax4.set_xlabel("Reactor length, z [m]")
 ax4.set_ylabel("Temperature [K]")
+ax4.legend([r"$T_{f}$", r"$T_{s}$"])
 ax4.grid(color='0.8')
 
 
@@ -444,8 +489,8 @@ plt.subplots_adjust(hspace=0.3)
 plt.show()
 
 
-print(f"\nReactor entrance:\nF_CH₃OH = {sol(z[0])[0]} mol/s\nF_O₂ = {sol(z[0])[1]} mol/s\nF_HCHO = {sol(z[0])[2]} mol/s\nF_H₂O = {sol(z[0])[3]} mol/s\nF_CO = {sol(z[0])[4]} mol/s\nF_DME = {sol(z[0])[5]} mol/s\nF_DMM = {sol(z[0])[6]} mol/s\nCs_CH₃OH = {sol(z[0])[8]} mol/s\nCs_O₂ = {sol(z[0])[9]} mol/s\nCs_HCHO = {sol(z[0])[10]} mol/s\nCs_H₂O = {sol(z[0])[11]} mol/s\nCs_CO = {sol(z[0])[12]} mol/s\nCs_DME = {sol(z[0])[13]} mol/s\nCs_DMM = {sol(z[0])[14]} mol/s\nP = {sol(z[0])[7]} Pa\nT = {T_0} K\n")
+print(f"\nReactor entrance:\nF_CH₃OH = {sol(z[0])[0]} mol/s\nF_O₂ = {sol(z[0])[1]} mol/s\nF_HCHO = {sol(z[0])[2]} mol/s\nF_H₂O = {sol(z[0])[3]} mol/s\nF_CO = {sol(z[0])[4]} mol/s\nF_DME = {sol(z[0])[5]} mol/s\nF_DMM = {sol(z[0])[6]} mol/s\nCs_CH₃OH = {sol(z[0])[9]} mol/s\nCs_O₂ = {sol(z[0])[10]} mol/s\nCs_HCHO = {sol(z[0])[11]} mol/s\nCs_H₂O = {sol(z[0])[12]} mol/s\nCs_CO = {sol(z[0])[13]} mol/s\nCs_DME = {sol(z[0])[14]} mol/s\nCs_DMM = {sol(z[0])[15]} mol/s\nP = {sol(z[0])[7]} Pa\nT_f = {sol(z[0])[8]} K\nT_s = {sol(z[0])[16]} K\n")
 
-print(f"\nReactor exit:\nF_CH₃OH = {sol(z[-1])[0]} mol/s\nF_O₂ = {sol(z[-1])[1]} mol/s\nF_HCHO = {sol(z[-1])[2]} mol/s\nF_H₂O = {sol(z[-1])[3]} mol/s\nF_CO = {sol(z[-1])[4]} mol/s\nF_DME = {sol(z[-1])[5]} mol/s\nF_DMM = {sol(z[-1])[6]} mol/s\nCs_CH₃OH = {sol(z[-1])[8]} mol/s\nCs_O₂ = {sol(z[-1])[9]} mol/s\nCs_HCHO = {sol(z[-1])[10]} mol/s\nCs_H₂O = {sol(z[-1])[11]} mol/s\nCs_CO = {sol(z[-1])[12]} mol/s\nCs_DME = {sol(z[-1])[13]} mol/s\nCs_DMM = {sol(z[-1])[14]} mol/s\nP = {sol(z[-1])[7]} Pa\nT = {T_0} K\n")
+print(f"\nReactor exit:\nF_CH₃OH = {sol(z[-1])[0]} mol/s\nF_O₂ = {sol(z[-1])[1]} mol/s\nF_HCHO = {sol(z[-1])[2]} mol/s\nF_H₂O = {sol(z[-1])[3]} mol/s\nF_CO = {sol(z[-1])[4]} mol/s\nF_DME = {sol(z[-1])[5]} mol/s\nF_DMM = {sol(z[-1])[6]} mol/s\nCs_CH₃OH = {sol(z[-1])[9]} mol/s\nCs_O₂ = {sol(z[-1])[10]} mol/s\nCs_HCHO = {sol(z[-1])[11]} mol/s\nCs_H₂O = {sol(z[-1])[12]} mol/s\nCs_CO = {sol(z[-1])[13]} mol/s\nCs_DME = {sol(z[-1])[14]} mol/s\nCs_DMM = {sol(z[-1])[15]} mol/s\nP = {sol(z[-1])[7]} Pa\nT_f = {sol(z[-1])[8]} K\nT_s = {sol(z[-1])[16]} K\n")
 
-print(f"Conversion of Methanol: {(u_A[0]-u_A[-1])*1e2/u_A[0]}%")
+print(f"Conversion of Methanol: {round((u_A[0]-u_A[-1])*1e2/u_A[0], 4)}%")

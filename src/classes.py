@@ -44,6 +44,15 @@ class Molecule:
         return sum
 
     @staticmethod
+    def Cp_gas_mix(T, F_T, Mol_flows, Molecules):  # Motivation from Properties of gases and liquids
+        comb = list(zip(Mol_flows, Molecules))
+        sum = 0
+        for i in comb:
+            sum += (i[0]/F_T) * i[1].Cp(T)
+
+        return sum
+
+    @staticmethod
     def char_len(V_a: float, V_b: float) -> float:  # properties of gases and liquids 11-3, 11-4
         return 0.59*((V_a**(1/3))+(V_b**(1/3)))
 
@@ -70,8 +79,12 @@ class Molecule:
 
     def Cp(self, T: float) -> float:
         if self.name == "DMM":
+            if T > 1e40:
+                print(f"Joback: {T}")
             return 51.161 + 0.16244*T + 8.26e-5*(T**2) + (-8.51e-8*(T**3))  # C_p for DMM method of Joback parameters found in The properties of gases and liquids 
         else:
+            if T > 1e40:
+                print(T)
             return (self.params_cp[0] + (self.params_cp[1]*(self.params_cp[2]/(T*np.sinh(self.params_cp[2]/T)))**2) + (self.params_cp[3]*(self.params_cp[4]/(T*np.cosh(self.params_cp[4]/T)))**2))*1e-3  # from perry 2-149
 
     def kappa(self, T):  # perry 2-289 & Transport properties of hydrocarbons

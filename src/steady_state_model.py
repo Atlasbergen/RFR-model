@@ -55,7 +55,7 @@ def condition(out, u, t, integrator):
     out[5] = u[5]
     out[6] = u[6]
     out[8] = u[8] - 1000
-    out[9] = u[9] - 673.15
+    out[9] = u[9] - 1000
     return out
 
 
@@ -134,4 +134,4 @@ print(f"\nReactor entrance:\nF_CH₃OH = {sol(w[0])[0]} mol/s\nF_O₂ = {sol(w[0
 
 print(f"\nReactor exit:\nF_CH₃OH = {sol(w[-1])[0]} mol/s\nF_O₂ = {sol(w[-1])[1]} mol/s\nF_HCHO = {sol(w[-1])[2]} mol/s\nF_H₂O = {sol(w[-1])[3]} mol/s\nF_CO = {sol(w[-1])[4]} mol/s\nF_DME = {sol(w[-1])[5]} mol/s\nF_DMM = {sol(w[-1])[6]} mol/s\nP = {sol(w[-1])[8]} Pa\nT = {sol(w[-1])[9]} K\n")
 
-print(f"Conversion of Methanol: {(Y_A[0]-Y_A[-1])*1e2/Y_A[0]}%")
+print(f"Conversion of Methanol: {round((Y_A[0]-Y_A[-1])*1e2/Y_A[0], 4)}%")
