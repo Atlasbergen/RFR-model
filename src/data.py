@@ -9,14 +9,14 @@ T_0 = 280 + 273.15  # [K]
 P_0 = 101325  # [Pa]
 u_0 = 2  # [m/s]
 
-F_A0 = 0.1  # [mol/s]
-F_B0 = 0.1  # [mol/S]
+F_A0 = 0.01  # [mol/s]
+F_B0 = 0.01  # [mol/S]
 F_C0 = 0  # [mol/s]
 F_D0 = 0  # [mol/s]
 F_E0 = 0  # [mol/s]
 F_F0 = 0  # [mol/s]
 F_G0 = 0  # [mol/s]
-F_I0 = 0.8  # [mol/s]
+F_I0 = 0.98  # [mol/s]
 F_T0 = F_A0 + F_B0 + F_I0
 
 C_A0 = (F_A0/F_T0) * (P_0/(R*T_0))  # [mol/m³]

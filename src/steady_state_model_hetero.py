@@ -420,7 +420,7 @@ my_func = de.ODEFunction(f, mass_matrix=M)
 prob_mm = de.ODEProblem(my_func, f0, z_span)
 sol = de.solve(
     prob_mm,
-    de.Rodas5P(autodiff=False),
+    de.Rodas4P2(autodiff=False),
     callback=cb,
     saveat=0.001,
     reltol=1e-6,
