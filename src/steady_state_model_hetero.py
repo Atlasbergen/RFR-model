@@ -97,14 +97,14 @@ r1, r2, r3, r4, r5 = [
 ]
 
 
-def B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
+def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r, d_t, d_p):
     return (
-        G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)
+        G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r)
         * (
             (1 - porosity(d_t, d_p))
             / (
-                rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0,
-                        F_D0, F_E0, F_F0, F_G0, F_I0)
+                rho_mix(T_0, P_0, C_T0, C_A0, C_B0, C_C0,
+                        C_D0, C_E0, C_F0, C_G0, C_I0)
                 * d_p
                 * (porosity(d_t, d_p) ** 3)
             )
@@ -116,14 +116,14 @@ def B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
                     * (1 - porosity(d_t, d_p))
                     * Molecule.mu_gas_mix(
                         T,
-                        F_T,
-                        [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I],
+                        C_T,
+                        [C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I],
                         [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2],
                     )
                 )
                 / d_p
             )
-            + 1.75 * G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)
+            + 1.75 * G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r)
         )
     )
 
@@ -420,7 +420,7 @@ my_func = de.ODEFunction(f, mass_matrix=M)
 prob_mm = de.ODEProblem(my_func, f0, z_span)
 sol = de.solve(
     prob_mm,
-    de.Rodas4P2(autodiff=False),
+    de.Rodas5P(autodiff=False),
     callback=cb,
     saveat=0.001,
     reltol=1e-6,
@@ -488,6 +488,7 @@ ax4.grid(color='0.8')
 plt.subplots_adjust(hspace=0.3)
 plt.show()
 
+print(f"\nReactor length = {reactor_len(w_cat)} m\n")
 
 print(f"\nReactor entrance:\nF_CH₃OH = {sol(z[0])[0]} mol/s\nF_O₂ = {sol(z[0])[1]} mol/s\nF_HCHO = {sol(z[0])[2]} mol/s\nF_H₂O = {sol(z[0])[3]} mol/s\nF_CO = {sol(z[0])[4]} mol/s\nF_DME = {sol(z[0])[5]} mol/s\nF_DMM = {sol(z[0])[6]} mol/s\nCs_CH₃OH = {sol(z[0])[9]} mol/s\nCs_O₂ = {sol(z[0])[10]} mol/s\nCs_HCHO = {sol(z[0])[11]} mol/s\nCs_H₂O = {sol(z[0])[12]} mol/s\nCs_CO = {sol(z[0])[13]} mol/s\nCs_DME = {sol(z[0])[14]} mol/s\nCs_DMM = {sol(z[0])[15]} mol/s\nP = {sol(z[0])[7]} Pa\nT_f = {sol(z[0])[8]} K\nT_s = {sol(z[0])[16]} K\n")
 

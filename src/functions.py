@@ -2,8 +2,8 @@ from data import *
 import numpy as np
 
 
-def rho_mix(T, P, F_tot, F_meth, F_O2, F_HCHO, F_H2O, F_CO, F_DME, F_DMM, F_N2):
-    return 32.042e-3*(F_meth*P/(R*T*F_tot)) + 32e-3*(F_O2*P/(R*T*F_tot)) + 28e-3*(F_N2*P/(R*T*F_tot)) + 18e-3*(F_H2O*P/(R*T*F_tot)) + 30e-3*(F_HCHO*P/(R*T*F_tot)) + 28e-3*(F_CO*P/(R*T*F_tot)) + 46.047e-3*(F_DME*P/(R*T*F_tot)) + 76.097e-3*(F_DMM*P/(R*T*F_tot))
+def rho_mix(T, P, C_tot, C_meth, C_O2, C_HCHO, C_H2O, C_CO, C_DME, C_DMM, C_N2):
+    return 32.042e-3*(C_meth*P/(R*T*C_tot)) + 32e-3*(C_O2*P/(R*T*C_tot)) + 28e-3*(C_N2*P/(R*T*C_tot)) + 18e-3*(C_H2O*P/(R*T*C_tot)) + 30e-3*(C_HCHO*P/(R*T*C_tot)) + 28e-3*(C_CO*P/(R*T*C_tot)) + 46.047e-3*(C_DME*P/(R*T*C_tot)) + 76.097e-3*(C_DMM*P/(R*T*C_tot))
 
 
 def porosity(d_t, d_p):
@@ -18,32 +18,32 @@ def A_c(r):
     return 3.14*(r**2)
 
 
-def q_dot(F_T, P, T):
-    return F_T*R*T/P
+# def q_dot(F_T, P, T):
+#     return F_T*R*T/P
+#
+#
+# def u(F_T, P, T, r):
+#     return q_dot(F_T, P, T) / (3.14*(r**2))
 
 
-def u(F_T, P, T, r):
-    return q_dot(F_T, P, T) / (3.14*(r**2))
-
-
-def u_2(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I):
+def u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I):
     return u_0 * rho_mix(T_0, P_0, C_T0, C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, C_I0) / rho_mix(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)
 
 
-def q_dot_2(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I):
-    return vel(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)*A_c(r_inner)
+def q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I):
+    return u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)*A_c(r_inner)
 
 
-def G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r):
-    return rho_mix(T, P, F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I)*u(F_T, P, T, r)
-
-
-def B_0(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
-    return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*mu(T, 6.5592E-07, 0.6081 , 54.714))/d_p) + 1.75*G(F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0, P_0, T_0, r)))
+def G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r):
+    return rho_mix(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)*u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)
 
 
 def C(F, F_T, P, T):
     return F/q_dot(F_T, P, T)
+
+
+def F(T, P, C, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T):
+    return C*q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)
 
 
 def Re(rho, mu, U, dp):
@@ -88,5 +88,6 @@ def reactor_len(w):
 if __name__ == "__main__":
     # test things here
     print(reactor_len(w_cat))
-    print(u(F_T0, P_0, T_0, r_inner))
+    print(u(T_0, P_0, C_T0, C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, C_I0))
+    print(F(T_0, P_0, C_A0, C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, C_I0, C_T0))
     print(C_A0)

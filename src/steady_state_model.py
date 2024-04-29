@@ -24,25 +24,52 @@ r1, r2, r3, r4, r5 = [
 ]
 
 
-def B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r, d_t, d_p):
-    return (G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)*((1-porosity(d_t, d_p))/(rho_mix(T_0, P_0, F_T0, F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0)*d_p*(porosity(d_t, d_p)**3)))*(((150*(1-porosity(d_t, d_p))*Molecule.mu_gas_mix(T, F_T, [F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]))/d_p) + 1.75*G(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r)))
+def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r, d_t, d_p):
+    return (
+        G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r)
+        * (
+            (1 - porosity(d_t, d_p))
+            / (
+                rho_mix(T_0, P_0, C_T0, C_A0, C_B0, C_C0,
+                        C_D0, C_E0, C_F0, C_G0, C_I0)
+                * d_p
+                * (porosity(d_t, d_p) ** 3)
+            )
+        )
+        * (
+            (
+                (
+                    150
+                    * (1 - porosity(d_t, d_p))
+                    * Molecule.mu_gas_mix(
+                        T,
+                        C_T,
+                        [C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I],
+                        [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2],
+                    )
+                )
+                / d_p
+            )
+            + 1.75 * G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r)
+        )
+    )
 
 
-def dFdw(F, p, t):
-    F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T = F
-    F_T = F_A + F_B + F_C + F_D + F_E + F_F + F_G + F_I
+def dCdw(C, p, t):
+    C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T = C
+    C_T = C_A + C_B + C_C + C_D + C_E + C_F + C_G + C_I
 
     return [
-        -(r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + 2*r3.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + 2*r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))),
-        -0.5*(r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))),
-        (r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))) - (r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))),
-        r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r3.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) + r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)),
-        r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)),
-        r3.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)) - 0.5*r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)),
-        r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T)),
+        -(r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 2*r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 2*r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)),
+        -0.5*(r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)),
+        (r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)) - (r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)),
+        r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.5*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
+        r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
+        r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) - 0.5*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
+        r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
         0,
-        -(B_0_new(F_T, F_A, F_B, F_C, F_D, F_E, F_F, F_G, F_I, P, T, r_inner, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*(F_T/F_T0),
-        ((-r1.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r1.H_rxn(T))+(-r2.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r2.H_rxn(T))+(-r3.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r3.H_rxn(T))+(-r4.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r4.H_rxn(T))+(-r5.r(T, F_A/q_dot(F_T, P, T), F_B/q_dot(F_T, P, T), F_C/q_dot(F_T, P, T), F_D/q_dot(F_T, P, T), F_E/q_dot(F_T, P, T), F_F/q_dot(F_T, P, T), F_G/q_dot(F_T, P, T))*r5.H_rxn(T)))/(F_A*CH3OH.Cp(T) + F_B*O2.Cp(T) + F_C*HCHO.Cp(T) + F_D*H2O.Cp(T) + F_E*CO.Cp(T) + F_F*DME.Cp(T) + F_G*DMM.Cp(T) + F_I*N2.Cp(T)),
+        -(B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r_inner, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*((C_T*u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I))/(C_T0*u_0)),
+        ((-r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r1.H_rxn(T))+(-r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r2.H_rxn(T))+(-r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r3.H_rxn(T))+(-r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r4.H_rxn(T))+(-r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r5.H_rxn(T)))/(F(T, P, C_A, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*CH3OH.Cp(T) + F(T, P, C_B, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*O2.Cp(T) + F(T, P, C_C, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*HCHO.Cp(T) + F(T, P, C_D, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*H2O.Cp(T) + F(T, P, C_E, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*CO.Cp(T) + F(T, P, C_F, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*DME.Cp(T) + F(T, P, C_G, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*DMM.Cp(T) + F(T, P, C_I, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*N2.Cp(T)),
     ]
 
 
@@ -84,9 +111,9 @@ def affect_b(integrator, idx):
 cb = de.VectorContinuousCallback(condition, affect_b, 10)
 
 w_span = (0, w_cat)
-F_0 = [F_A0, F_B0, F_C0, F_D0, F_E0, F_F0, F_G0, F_I0, P_0, T_0]
+C_0 = [C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, C_I0, P_0, T_0]
 
-prob = de.ODEProblem(dFdw, F_0, w_span)
+prob = de.ODEProblem(dCdw, C_0, w_span)
 sol = de.solve(prob, de.Tsit5(), callback = cb, saveat=0.001)
 
 w = sol.t
