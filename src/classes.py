@@ -1,5 +1,8 @@
 from scipy.integrate import quad
 import numpy as np
+from decimal import Decimal, getcontext
+
+getcontext().prec = 200
 
 R = 8.314
 
@@ -21,34 +24,34 @@ class Molecule:
         self.params_kappa = params_kappa
 
     @staticmethod
-    def mu_gas_mix(T, F_T, Mol_flows, Molecules):  # Properties of gases and liquids
-        comb = list(zip(Mol_flows, Molecules))
+    def mu_gas_mix(T, C_T, Conc, Molecules):  # Properties of gases and liquids
+        comb = list(zip(Conc, Molecules))
         sum = 0
 
         for i, j in enumerate(comb):
-            numerator = (j[0]/F_T)*j[1].mu(T)
+            numerator = (j[0]/C_T)*j[1].mu(T)
             denom = 0
             for k, m in enumerate(comb):
-                denom += (m[0]/F_T)*phi_ij(j[1].mu(T), m[1].mu(T), j[1].M_w, m[1].M_w)
+                denom += (m[0]/C_T)*phi_ij(j[1].mu(T), m[1].mu(T), j[1].M_w, m[1].M_w)
             sum += numerator/denom
 
         return sum
 
     @staticmethod
-    def kappa_gas_mix(T, F_T, Mol_flows, Molecules):  # Motivation from Properties of gases and liquids
-        comb = list(zip(Mol_flows, Molecules))
+    def kappa_gas_mix(T, C_T, Conc, Molecules):  # Motivation from Properties of gases and liquids
+        comb = list(zip(Conc, Molecules))
         sum = 0
         for i in comb:
-            sum += (i[0]/F_T) * i[1].kappa(T)
+            sum += (i[0]/C_T) * i[1].kappa(T)
 
         return sum
 
     @staticmethod
-    def Cp_gas_mix(T, F_T, Mol_flows, Molecules):  # Motivation from Properties of gases and liquids
-        comb = list(zip(Mol_flows, Molecules))
+    def Cp_gas_mix(T, C_T, Conc, Molecules):  # Motivation from Properties of gases and liquids
+        comb = list(zip(Conc, Molecules))
         sum = 0
         for i in comb:
-            sum += (i[0]/F_T) * i[1].Cp(T)
+            sum += (i[0]/C_T) * i[1].Cp(T)
 
         return sum
 
@@ -70,7 +73,7 @@ class Molecule:
 
     def mu(self, T: float) -> float:
         if self.name == "DMM":
-            return (self.params_vis[0] + self.params_vis[1]*T + self.params_vis[2]*T**2 + self.params_vis[3]*T**3)*1e-7   # from Transport properties of hydrocarbons
+            return (self.params_vis[0] + self.params_vis[1]*T + self.params_vis[2]*T**2 + self.params_vis[3]*np.float_power(T, 3, dtype=np.longdouble))*1e-7   # from Transport properties of hydrocarbons
         else:
             return self.params_vis[0]*(T**self.params_vis[1])/(1 + (self.params_vis[2]/T))  # from perry 2-267
 
@@ -81,11 +84,11 @@ class Molecule:
         if self.name == "DMM":
             if T > 1e40:
                 print(f"Joback: {T}")
-            return 51.161 + 0.16244*T + 8.26e-5*(T**2) + (-8.51e-8*(T**3))  # C_p for DMM method of Joback parameters found in The properties of gases and liquids 
+            return 51.161 + 0.16244*T + 8.26e-5*(T**2) + (-8.51e-8*(np.float_power(T, 3, dtype=np.longdouble)))  # C_p for DMM method of Joback parameters found in The properties of gases and liquids 
         else:
             if T > 1e40:
                 print(T)
-            return (self.params_cp[0] + (self.params_cp[1]*(self.params_cp[2]/(T*np.sinh(self.params_cp[2]/T)))**2) + (self.params_cp[3]*(self.params_cp[4]/(T*np.cosh(self.params_cp[4]/T)))**2))*1e-3  # from perry 2-149
+            return (self.params_cp[0] + (self.params_cp[1]*(self.params_cp[2]/(T*np.sinh(self.params_cp[2]/T, dtype=np.longdouble)))**2) + (self.params_cp[3]*(self.params_cp[4]/(T*np.cosh(self.params_cp[4]/T, dtype=np.longdouble)))**2))*1e-3  # from perry 2-149
 
     def kappa(self, T):  # perry 2-289 & Transport properties of hydrocarbons
         if self.name == "DMM":
@@ -93,17 +96,14 @@ class Molecule:
         else:
             return self.params_kappa[0]*T**self.params_kappa[1] / (1 + (self.params_kappa[2]/T) + (self.params_kappa[3]/T**2))
 
-    def D_eff(self, T, P, F_T, F_main, Mol_flows, Molecules):
-        comb = list(zip(Mol_flows, Molecules))
+    def D_eff(self, T, P, C_T, C_main, Conc, Molecules):
+        comb = list(zip(Conc, Molecules))
         denom = 0
-        numerator = 1 - (F_main/F_T)
+        numerator = 1 - (C_main/C_T)
         for i in comb:
-            denom += (i[0]/F_T)/Molecule.D_AB(T, P, self.T_boil, i[1].T_boil, self.Vb, i[1].Vb, self.M_w, i[1].M_w)
-        # sum = 0
-        # for i in comb:
-        #     sum += (i[0]/F_T) / Molecule.D_AB(T, P, self.T_boil, i[1].T_boil, self.Vb, i[1].Vb, self.M_w, i[1].M_w)
+            denom += (i[0]/C_T)/Molecule.D_AB(T, P, self.T_boil, i[1].T_boil, self.Vb, i[1].Vb, self.M_w, i[1].M_w)
 
-        return numerator / denom  # (sum)**-1
+        return numerator / denom
 
 
 class Reaction:
