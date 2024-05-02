@@ -137,8 +137,8 @@ ax1.plot(w, Y_A, w, Y_B, w, Y_C, w, Y_D, w, Y_E, w, Y_F, w, Y_G, linewidth=0.9)
 ax1.tick_params(axis="both",direction="in")
 ax1.spines[["top", "right"]].set_visible(False)
 ax1.set_xlabel("catalyst weight, W [kg]")
-ax1.set_ylabel("F [mol/s]")
-ax1.legend([r"$F_{CH_3OH}$", r"$F_{O_2}$", r"$F_{HCHO}$", r"$F_{H_2O}$", r"$F_{CO}$", r"$F_{DME}$", r"$F_{DMM}$"], loc="center left")
+ax1.set_ylabel("Concentration, C [mol/m³]")
+ax1.legend([r"$C_{CH_3OH}$", r"$C_{O_2}$", r"$C_{HCHO}$", r"$C_{H_2O}$", r"$C_{CO}$", r"$C_{DME}$", r"$C_{DMM}$"], loc="center left")
 ax1.grid(color='0.8')
 
 ax2.plot(w, (P_0-np.array(Y_P))*1e2/P_0, linewidth=0.9)
@@ -157,8 +157,8 @@ ax3.grid(color='0.8')
 
 plt.show()
 
-print(f"\nReactor entrance:\nF_CH₃OH = {sol(w[0])[0]} mol/s\nF_O₂ = {sol(w[0])[1]} mol/s\nF_HCHO = {sol(w[0])[2]} mol/s\nF_H₂O = {sol(w[0])[3]} mol/s\nF_CO = {sol(w[0])[4]} mol/s\nF_DME = {sol(w[0])[5]} mol/s\nF_DMM = {sol(w[0])[6]} mol/s\nP = {sol(w[0])[8]} Pa\nT = {sol(w[0])[9]} K\n")
+print(f"\nReactor entrance:\nC_CH₃OH = {sol(w[0])[0]} mol/m³\nC_O₂ = {sol(w[0])[1]} mol/m³\nC_HCHO = {sol(w[0])[2]} mol/m³\nC_H₂O = {sol(w[0])[3]} mol/m³\nC_CO = {sol(w[0])[4]} mol/m³\nC_DME = {sol(w[0])[5]} mol/m³\nC_DMM = {sol(w[0])[6]} mol/m³\nP = {sol(w[0])[8]} Pa\nT = {sol(w[0])[9]} K\n")
 
-print(f"\nReactor exit:\nF_CH₃OH = {sol(w[-1])[0]} mol/s\nF_O₂ = {sol(w[-1])[1]} mol/s\nF_HCHO = {sol(w[-1])[2]} mol/s\nF_H₂O = {sol(w[-1])[3]} mol/s\nF_CO = {sol(w[-1])[4]} mol/s\nF_DME = {sol(w[-1])[5]} mol/s\nF_DMM = {sol(w[-1])[6]} mol/s\nP = {sol(w[-1])[8]} Pa\nT = {sol(w[-1])[9]} K\n")
+print(f"\nReactor exit:\nC_CH₃OH = {sol(w[-1])[0]} mol/m³\nC_O₂ = {sol(w[-1])[1]} mol/m³\nC_HCHO = {sol(w[-1])[2]} mol/m³\nC_H₂O = {sol(w[-1])[3]} mol/m³\nC_CO = {sol(w[-1])[4]} mol/m³\nC_DME = {sol(w[-1])[5]} mol/m³\nC_DMM = {sol(w[-1])[6]} mol/m³\nP = {sol(w[-1])[8]} Pa\nT = {sol(w[-1])[9]} K\n")
 
 print(f"Conversion of Methanol: {round((Y_A[0]-Y_A[-1])*1e2/Y_A[0], 4)}%")

@@ -359,7 +359,7 @@ def condition(out, u, t, integrator):
     out[5] = u[5]
     out[6] = u[6]
     out[7] = u[7] - 1000
-    out[8] = u[8]  # - 700
+    out[8] = u[8] - 1000
     out[9] = u[9]
     out[10] = u[10]
     out[11] = u[11]
@@ -367,7 +367,7 @@ def condition(out, u, t, integrator):
     out[13] = u[13]
     out[14] = u[14]
     out[15] = u[15]
-    out[16] = u[16]
+    out[16] = u[16] - 1000
     return out
 
 
@@ -405,12 +405,12 @@ def affect_b(integrator, idx):
     elif idx == 16:
         integrator.u[15] = 0
     elif idx == 17:
-        integrator.u[16] = 0
+        integrator.u[16] = 1000
 
 
 cb = de.VectorContinuousCallback(condition, affect_b, 17)
 
-f0 = [C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, P_0, T_0, C_As0, C_Bs0, C_Cs0, C_Ds0, C_Es0, C_Fs0, C_Gs0, T_0]
+f0 = [C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, P_0, T_0, C_As0, C_Bs0, C_Cs0, C_Ds0, C_Es0, C_Fs0, C_Gs0, Ts_0]
 
 M = mass_mat(17, 9)
 z_span = (0, reactor_len(w_cat))
@@ -452,12 +452,12 @@ u_Ts = u_vals[16]
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(20, 18))
 
 ax1.plot(z, u_A, z, u_B, z, u_C, z, u_D, z, u_E, z, u_F, z, u_G, linewidth=0.8)
-ax1.set_title("Molarflow in bulk vs reactor length")
+ax1.set_title("Concentration in gas phase vs reactor length")
 ax1.tick_params(axis="both",direction="in")
 ax1.spines[["top", "right"]].set_visible(False)
 ax1.set_xlabel("Reactor length, z [m]")
-ax1.set_ylabel("Molar flow, F [mol/s]")
-ax1.legend([r"$F_{CH_3OH}$", r"$F_{O_2}$", r"$F_{HCHO}$", r"$F_{H_2O}$", r"$F_{CO}$", r"$F_{DME}$", r"$F_{DMM}$"], loc="lower center", bbox_to_anchor=(0.5, -0.2), ncol=7)
+ax1.set_ylabel("Concentration, C [mol/m³]")
+ax1.legend([r"$C_{CH_3OH}$", r"$C_{O_2}$", r"$C_{HCHO}$", r"$C_{H_2O}$", r"$C_{CO}$", r"$C_{DME}$", r"$C_{DMM}$"], loc="lower center", bbox_to_anchor=(0.5, -0.2), ncol=7)
 ax1.grid(color='0.8')
 
 ax2.plot(z, u_As, z, u_Bs, z, u_Cs, z, u_Ds, z, u_Es, z, u_Fs, z, u_Gs, linewidth=0.8)
@@ -490,8 +490,8 @@ plt.show()
 
 print(f"\nReactor length = {reactor_len(w_cat)} m\n")
 
-print(f"\nReactor entrance:\nF_CH₃OH = {sol(z[0])[0]} mol/s\nF_O₂ = {sol(z[0])[1]} mol/s\nF_HCHO = {sol(z[0])[2]} mol/s\nF_H₂O = {sol(z[0])[3]} mol/s\nF_CO = {sol(z[0])[4]} mol/s\nF_DME = {sol(z[0])[5]} mol/s\nF_DMM = {sol(z[0])[6]} mol/s\nCs_CH₃OH = {sol(z[0])[9]} mol/s\nCs_O₂ = {sol(z[0])[10]} mol/s\nCs_HCHO = {sol(z[0])[11]} mol/s\nCs_H₂O = {sol(z[0])[12]} mol/s\nCs_CO = {sol(z[0])[13]} mol/s\nCs_DME = {sol(z[0])[14]} mol/s\nCs_DMM = {sol(z[0])[15]} mol/s\nP = {sol(z[0])[7]} Pa\nT_f = {sol(z[0])[8]} K\nT_s = {sol(z[0])[16]} K\n")
+print(f"\nReactor entrance:\nC_CH₃OH = {sol(z[0])[0]} mol/m³\nC_O₂ = {sol(z[0])[1]} mol/m³\nC_HCHO = {sol(z[0])[2]} mol/m³\nC_H₂O = {sol(z[0])[3]} mol/m³\nC_CO = {sol(z[0])[4]} mol/m³\nC_DME = {sol(z[0])[5]} mol/m³\nC_DMM = {sol(z[0])[6]} mol/m³\nCs_CH₃OH = {sol(z[0])[9]} mol/m³\nCs_O₂ = {sol(z[0])[10]} mol/m³\nCs_HCHO = {sol(z[0])[11]} mol/m³\nCs_H₂O = {sol(z[0])[12]} mol/m³\nCs_CO = {sol(z[0])[13]} mol/m³\nCs_DME = {sol(z[0])[14]} mol/m³\nCs_DMM = {sol(z[0])[15]} mol/m³\nP = {sol(z[0])[7]} Pa\nT_f = {sol(z[0])[8]} K\nT_s = {sol(z[0])[16]} K\n")
 
-print(f"\nReactor exit:\nF_CH₃OH = {sol(z[-1])[0]} mol/s\nF_O₂ = {sol(z[-1])[1]} mol/s\nF_HCHO = {sol(z[-1])[2]} mol/s\nF_H₂O = {sol(z[-1])[3]} mol/s\nF_CO = {sol(z[-1])[4]} mol/s\nF_DME = {sol(z[-1])[5]} mol/s\nF_DMM = {sol(z[-1])[6]} mol/s\nCs_CH₃OH = {sol(z[-1])[9]} mol/s\nCs_O₂ = {sol(z[-1])[10]} mol/s\nCs_HCHO = {sol(z[-1])[11]} mol/s\nCs_H₂O = {sol(z[-1])[12]} mol/s\nCs_CO = {sol(z[-1])[13]} mol/s\nCs_DME = {sol(z[-1])[14]} mol/s\nCs_DMM = {sol(z[-1])[15]} mol/s\nP = {sol(z[-1])[7]} Pa\nT_f = {sol(z[-1])[8]} K\nT_s = {sol(z[-1])[16]} K\n")
+print(f"\nReactor exit:\nC_CH₃OH = {sol(z[-1])[0]} mol/m³\nC_O₂ = {sol(z[-1])[1]} mol/m³\nC_HCHO = {sol(z[-1])[2]} mol/m³\nC_H₂O = {sol(z[-1])[3]} mol/m³\nC_CO = {sol(z[-1])[4]} mol/m³\nC_DME = {sol(z[-1])[5]} mol/m³\nC_DMM = {sol(z[-1])[6]} mol/m³\nCs_CH₃OH = {sol(z[-1])[9]} mol/m³\nCs_O₂ = {sol(z[-1])[10]} mol/m³\nCs_HCHO = {sol(z[-1])[11]} mol/m³\nCs_H₂O = {sol(z[-1])[12]} mol/m³\nCs_CO = {sol(z[-1])[13]} mol/m³\nCs_DME = {sol(z[-1])[14]} mol/m³\nCs_DMM = {sol(z[-1])[15]} mol/m³\nP = {sol(z[-1])[7]} Pa\nT_f = {sol(z[-1])[8]} K\nT_s = {sol(z[-1])[16]} K\n")
 
 print(f"Conversion of Methanol: {round((u_A[0]-u_A[-1])*1e2/u_A[0], 4)}%")

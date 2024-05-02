@@ -1,8 +1,5 @@
 from scipy.integrate import quad
 import numpy as np
-from decimal import Decimal, getcontext
-
-getcontext().prec = 200
 
 R = 8.314
 
@@ -73,7 +70,7 @@ class Molecule:
 
     def mu(self, T: float) -> float:
         if self.name == "DMM":
-            return (self.params_vis[0] + self.params_vis[1]*T + self.params_vis[2]*T**2 + self.params_vis[3]*np.float_power(T, 3, dtype=np.longdouble))*1e-7   # from Transport properties of hydrocarbons
+            return (self.params_vis[0] + self.params_vis[1]*T + self.params_vis[2]*T**2 + self.params_vis[3]*(T**3))*1e-7   # from Transport properties of hydrocarbons
         else:
             return self.params_vis[0]*(T**self.params_vis[1])/(1 + (self.params_vis[2]/T))  # from perry 2-267
 
@@ -82,12 +79,12 @@ class Molecule:
 
     def Cp(self, T: float) -> float:
         if self.name == "DMM":
-            if T > 1e40:
-                print(f"Joback: {T}")
-            return 51.161 + 0.16244*T + 8.26e-5*(T**2) + (-8.51e-8*(np.float_power(T, 3, dtype=np.longdouble)))  # C_p for DMM method of Joback parameters found in The properties of gases and liquids 
+            # if T > 1e5:
+            #     print(f"Joback: {T}")
+            return 51.161 + 0.16244*T + 8.26e-5*(np.power(T, 2, dtype=np.longdouble)) + (-8.51e-8*np.power(T, 3, dtype=np.longdouble))  # C_p for DMM method of Joback parameters found in The properties of gases and liquids 
         else:
-            if T > 1e40:
-                print(T)
+            # if T > 1e5:
+            #     print(T)
             return (self.params_cp[0] + (self.params_cp[1]*(self.params_cp[2]/(T*np.sinh(self.params_cp[2]/T, dtype=np.longdouble)))**2) + (self.params_cp[3]*(self.params_cp[4]/(T*np.cosh(self.params_cp[4]/T, dtype=np.longdouble)))**2))*1e-3  # from perry 2-149
 
     def kappa(self, T):  # perry 2-289 & Transport properties of hydrocarbons
@@ -212,9 +209,9 @@ class Reaction:
                 )
             )
         elif self.name == "reaction_3":
-            return Reaction.k(Reaction.A_DMEf, T, Reaction.Ea_DMEf) * (C_A*R*T/101325) - (Reaction.k(Reaction.A_DMEf, T, Reaction.Ea_DMEf) / Reaction.K_eq_DME(T)) * (C_F * C_D * R * T * (101325)**-1/ C_A)
+            return Reaction.k(Reaction.A_DMEf, T, Reaction.Ea_DMEf) * (C_A*R*T/101325) - (Reaction.k(Reaction.A_DMEf, T, Reaction.Ea_DMEf) / Reaction.K_eq_DME(T)) * (C_F * C_D * R * T * (101325)**-1/C_A)
         elif self.name == "reaction_4":
-            return Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf) * (C_A * C_C * (R*T/101325)**2) - (Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf)/Reaction.K_eq_DMM(T))*(C_D*C_G*R*T*(101325)**-1/C_A)
+            return Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf) * (C_A * C_C * np.power(R*T/101325, 2, dtype=np.longdouble)) - (Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf)/Reaction.K_eq_DMM(T))*(C_D*C_G*R*T*(101325)**-1/C_A)
         elif self.name == "reaction_5":
             return Reaction.k(Reaction.A_DMEHCHO, T, Reaction.Ea_DMEHCHO)*(Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(C_F*R*T/101325)/(1 + Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(C_F*R*T/101325)))*((Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)/(1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)))
         else:
