@@ -23,32 +23,45 @@ r1, r2, r3, r4, r5 = [
     Reaction("reaction_5", [1, 1], [2, 1], [DME, O2], [HCHO, H2O]),
 ]
 
-m = 20
+m = 400
 snaps = 600
 t_dur = 300
 
 catalyst_weight = w_cat
 dx = catalyst_weight / m
 
-num_vars = 4
+num_vars = 7
 
 
-def deriv(t, u):
-    dudt = np.zeros_like(u)
+def deriv(t, C):
+    dCdt = np.zeros_like(C)
 
     for i in range(1, m):
-        dudt[i] = -u_0 * ((u[i] - u[i-1]) / (dx)) - r1.r(T_0, u[i], u[i + m], u[i + 2*m], u[i + 3*m], 0, 0, 0)
-        dudt[i + m] = -u_0 * ((u[i + m] - u[i-1 + m]) / (dx)) - 0.5*r1.r(T_0, u[i], u[i + m], u[i + 2*m], u[i + 3*m], 0, 0, 0)
-        dudt[i + 2*m] = -u_0 * ((u[i + 2*m] - u[i-1 + 2*m]) / (dx)) + r1.r(T_0, u[i], u[i + m], u[i + 2*m], u[i + 3*m], 0, 0, 0)
-        dudt[i + 3*m] = -u_0 * ((u[i + 3*m] - u[i-1 + 3*m]) / (dx)) + r1.r(T_0, u[i], u[i + m], u[i + 2*m], u[i + 3*m], 0, 0, 0)
+        
+        C_tot = C[i] + C[i + m] + C[i + 2*m] + C[i + 3*m] + C[i + 4*m] + C[i + 5*m] + C[i + 6*m] + C_I0
 
-    dudt[0] = 0 
-    return dudt
+        dCdt[i] = -u(T_0, P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0) * ((C[i] - C[i-1]) / (dx)) - (r1.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + 2*r3.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + 2*r4.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]))
+
+        dCdt[i + m] = -u(T_0, P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0) * ((C[i + m] - C[i-1 + m]) / (dx)) - 0.5*(r1.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + r2.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + r5.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]))
+
+        dCdt[i + 2*m] = -u(T_0, P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0) * ((C[i + 2*m] - C[i-1 + 2*m]) / (dx)) + (r1.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + r5.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m])) - (r2.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + r4.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]))
+
+        dCdt[i + 3*m] = -u(T_0, P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0) * ((C[i + 3*m] - C[i-1 + 3*m]) / (dx)) + (r1.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + r2.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + r3.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + r4.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) + 0.5*r5.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]))
+        
+        dCdt[i + 4*m] = -u(T_0, P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0) * ((C[i + 4*m] - C[i-1 + 4*m]) / (dx)) + r2.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m])
+
+        dCdt[i + 5*m] = -u(T_0, P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0) * ((C[i + 5*m] - C[i-1 + 5*m]) / (dx)) + r3.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m]) - 0.5*r5.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m])
+
+        dCdt[i + 6*m] = -u(T_0, P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0) * ((C[i + 6*m] - C[i-1 + 6*m]) / (dx)) + r4.r(T_0, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m])
+
+    # dCdt[0] = 0
+    return dCdt
 
 
 uinit = np.zeros(num_vars*m)
-uinit[:m] = C_A0
-uinit[m:2*m] = C_B0
+uinit[0] = C_A0
+uinit[m] = C_B0
+uinit[1:m] = 1e-100
 
 time = np.linspace(0, t_dur, snaps)
 
@@ -56,9 +69,11 @@ sol = solve_ivp(deriv, (0, t_dur), uinit, method='RK45', t_eval=time, atol=1e-12
 
 x_points = np.linspace(0, catalyst_weight, m)
 
-plt.plot(x_points, sol.y[:m, -1], x_points, sol.y[m:2*m, -1], x_points, sol.y[2*m:3*m, -1], x_points, sol.y[3*m:4*m, -1])
+plt.plot(x_points, sol.y[:m, -1], x_points, sol.y[m:2*m, -1], x_points, sol.y[2*m:3*m, -1], x_points, sol.y[3*m:4*m, -1], x_points, sol.y[4*m:5*m, -1], x_points, sol.y[5*m:6*m, -1], x_points, sol.y[6*m:, -1])
 
 plt.show()
 
-plt.plot(time, sol.y[-1])
+plt.plot(time, sol.y[1])
 plt.show()
+
+print(sol.y[3*m - 1, -1])
