@@ -5,86 +5,14 @@ from classes import *
 from functions import *
 
 CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2 = [
-    Molecule(
-        "Methanol",
-        Mw_Me,
-        H_f_Me,
-        Tb_Me,
-        Vb_Me,
-        Param_Mu_Me,
-        Param_Cp_Me,
-        Param_kappa_Me,
-    ),
-    Molecule(
-        "Oxygen", 
-        Mw_O2,
-        H_f_O2,
-        Tb_O2, 
-        Vb_O2, 
-        Param_Mu_O2, 
-        Param_Cp_O2, 
-        Param_kappa_O2
-    ),
-    Molecule(
-        "Formaldehyde",
-        Mw_HCHO,
-        H_f_HCHO,
-        Tb_HCHO,
-        Vb_HCHO,
-        Param_Mu_HCHO,
-        Param_Cp_HCHO,
-        Param_kappa_HCHO,
-    ),
-    Molecule(
-        "Water",
-        Mw_H2O,
-        H_f_H2O,
-        Tb_H2O,
-        Vb_H2O,
-        Param_Mu_H2O,
-        Param_Cp_H2O,
-        Param_kappa_H2O,
-    ),
-    Molecule(
-        "Carbon Monoxide",
-        Mw_CO,
-        H_f_CO,
-        Tb_CO,
-        Vb_CO,
-        Param_Mu_CO,
-        Param_Cp_CO,
-        Param_kappa_CO,
-    ),
-    Molecule(
-        "DME",
-        Mw_DME,
-        H_f_DME,
-        Tb_DME,
-        Vb_DME,
-        Param_Mu_DME,
-        Param_Cp_DME,
-        Param_kappa_DME,
-    ),
-    Molecule(
-        "DMM",
-        Mw_DMM,
-        H_f_DMM,
-        Tb_DMM,
-        Vb_DMM,
-        Param_Mu_DMM,
-        [0, 0, 0, 0],
-        Param_kappa_DMM,
-    ),
-    Molecule(
-        "Nitrogen",
-        Mw_N2,
-        H_f_N2,
-        Tb_N2,
-        Vb_N2,
-        Param_Mu_N2,
-        Param_Cp_N2,
-        Param_kappa_N2,
-    ),
+    Molecule("Methanol", Mw_Me, H_f_Me, Tb_Me, Vb_Me, Param_Mu_Me, Param_Cp_Me, Param_kappa_Me,),
+    Molecule("Oxygen",  Mw_O2, H_f_O2,  Tb_O2, Vb_O2, Param_Mu_O2, Param_Cp_O2, Param_kappa_O2),
+    Molecule("Formaldehyde", Mw_HCHO, H_f_HCHO, Tb_HCHO, Vb_HCHO, Param_Mu_HCHO, Param_Cp_HCHO, Param_kappa_HCHO,),
+    Molecule("Water", Mw_H2O, H_f_H2O, Tb_H2O, Vb_H2O, Param_Mu_H2O, Param_Cp_H2O, Param_kappa_H2O,),
+    Molecule("Carbon Monoxide", Mw_CO, H_f_CO, Tb_CO, Vb_CO, Param_Mu_CO, Param_Cp_CO, Param_kappa_CO,),
+    Molecule("DME", Mw_DME, H_f_DME, Tb_DME, Vb_DME, Param_Mu_DME, Param_Cp_DME, Param_kappa_DME,),
+    Molecule("DMM", Mw_DMM, H_f_DMM, Tb_DMM, Vb_DMM, Param_Mu_DMM, [0, 0, 0, 0], Param_kappa_DMM,),
+    Molecule("Nitrogen", Mw_N2, H_f_N2, Tb_N2, Vb_N2, Param_Mu_N2, Param_Cp_N2, Param_kappa_N2,),
 ]
 
 
@@ -96,10 +24,11 @@ r1, r2, r3, r4, r5 = [
     Reaction("reaction_5", [1, 1], [2, 1], [DME, O2], [HCHO, H2O]),
 ]
 
+print(r1.H_rxn(400))
 
-def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r, d_t, d_p):
+def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, d_t, d_p):
     return (
-        G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r)
+        G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T)
         * (
             (1 - porosity(d_t, d_p))
             / (
@@ -123,7 +52,7 @@ def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r, d_t, d_p):
                 )
                 / d_p
             )
-            + 1.75 * G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r)
+            + 1.75 * G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T)
         )
     )
 
@@ -132,7 +61,7 @@ def f(df, f, p, t):
     C_A, C_B, C_C, C_D, C_E, C_F, C_G, P, T_f, C_As, C_Bs, C_Cs, C_Ds, C_Es, C_Fs, C_Gs, T_s = f
     C_T = C_A + C_B + C_C + C_D + C_E + C_F + C_G + C_I0
 
-    df[0] = (
+    df[0] = (1/u_0)*(
         k_c(
             rho_mix(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),
             Molecule.mu_gas_mix(
@@ -146,7 +75,7 @@ def f(df, f, p, t):
         * A_c(r_inner)
         * (C_As - C_A)
     )
-    df[1] = (
+    df[1] = (1/u_0)*(
         k_c(
             rho_mix(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),
             Molecule.mu_gas_mix(
@@ -160,7 +89,7 @@ def f(df, f, p, t):
         * A_c(r_inner)
         * (C_Bs - C_B)
     )
-    df[2] = (
+    df[2] = (1/u_0)*(
         k_c(
             rho_mix(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),
             Molecule.mu_gas_mix(
@@ -174,7 +103,7 @@ def f(df, f, p, t):
         * A_c(r_inner)
         * (C_Cs - C_C)
     )
-    df[3] = (
+    df[3] = (1/u_0)*(
         k_c(
             rho_mix(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),
             Molecule.mu_gas_mix(
@@ -188,7 +117,7 @@ def f(df, f, p, t):
         * A_c(r_inner)
         * (C_Ds - C_D)
     )
-    df[4] = (
+    df[4] = (1/u_0)*(
         k_c(
             rho_mix(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),
             Molecule.mu_gas_mix(
@@ -202,7 +131,7 @@ def f(df, f, p, t):
         * A_c(r_inner)
         * (C_Es - C_E)
     )
-    df[5] = (
+    df[5] = (1/u_0)*(
         k_c(
             rho_mix(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),
             Molecule.mu_gas_mix(
@@ -216,7 +145,7 @@ def f(df, f, p, t):
         * A_c(r_inner)
         * (C_Fs - C_F)
     )
-    df[6] = (
+    df[6] = (1/u_0)*(
         k_c(
             rho_mix(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),
             Molecule.mu_gas_mix(
@@ -231,7 +160,7 @@ def f(df, f, p, t):
         * (C_Gs - C_G)
     )
     
-    df[7] = -B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0, P, T_f, r_inner, 2*r_inner, 2*r_part)*(T_f/T_0)*(P_0/P)*((C_T*u(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0))/(C_T0*u_0))
+    df[7] = -B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0, P, T_f, 2*r_inner, 2*r_part)*(T_f/T_0)*(P_0/P)*((C_T*u(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0))/(C_T0*u_0))
     df[8] = (
         h(
             rho_mix(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),

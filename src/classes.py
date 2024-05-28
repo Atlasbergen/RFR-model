@@ -176,43 +176,48 @@ class Reaction:
         return (prod_result - reac_result) + quad(self.del_cp, T_ref, T)[0]
 
     def r(self, T, C_A, C_B, C_C, C_D, C_E, C_F, C_G):
-        if self.name == "reaction_1":
-            return (
-                Reaction.k(Reaction.A_HCHO, T, Reaction.Ea_HCHO)
-                * (
-                    (Reaction.k(Reaction.A_CH3OH, T, Reaction.Ea_CH3OH) * (C_A*R*T/101325))
-                    / (
-                        1
-                        + Reaction.k(Reaction.A_CH3OH, T, Reaction.Ea_CH3OH) * (C_A*R*T/101325)
-                        + Reaction.k(Reaction.A_H2O, T, Reaction.Ea_H2O) * (C_D*R*T/101325)
+        reaction_name = self.name
+
+        # print(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)
+
+        match reaction_name:
+            case "reaction_1":
+                return (
+                    Reaction.k(Reaction.A_HCHO, T, Reaction.Ea_HCHO)
+                    * (
+                        (Reaction.k(Reaction.A_CH3OH, T, Reaction.Ea_CH3OH) * (C_A*R*T/101325))
+                        / (
+                            1
+                            + Reaction.k(Reaction.A_CH3OH, T, Reaction.Ea_CH3OH) * (C_A*R*T/101325)
+                            + Reaction.k(Reaction.A_H2O, T, Reaction.Ea_H2O) * (C_D*R*T/101325)
+                        )
+                    )
+                    * (
+                        (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)
+                        / (1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5))
                     )
                 )
-                * (
-                    (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)
-                    / (1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5))
-                )
-            )
-        elif self.name == "reaction_2":
-            return (
-                Reaction.k(Reaction.A_CO, T, Reaction.Ea_CO)
-                * (
-                    (C_C*R*T/101325)
-                    / (
-                        1
-                        + Reaction.k(Reaction.A_CH3OH, T, Reaction.Ea_CH3OH) * (C_A*R*T/101325)
-                        + Reaction.k(Reaction.A_H2O, T, Reaction.Ea_H2O) * (C_D*R*T/101325)
+            case "reaction_2":
+                return (
+                    Reaction.k(Reaction.A_CO, T, Reaction.Ea_CO)
+                    * (
+                        (C_C*R*T/101325)
+                        / (
+                            1
+                            + Reaction.k(Reaction.A_CH3OH, T, Reaction.Ea_CH3OH) * (C_A*R*T/101325)
+                            + Reaction.k(Reaction.A_H2O, T, Reaction.Ea_H2O) * (C_D*R*T/101325)
+                        )
+                    )
+                    * (
+                        (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)
+                        / (1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5))
                     )
                 )
-                * (
-                    (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)
-                    / (1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5))
-                )
-            )
-        elif self.name == "reaction_3":
-            return Reaction.k(Reaction.A_DMEf, T, Reaction.Ea_DMEf) * (C_A*R*T/101325) - (Reaction.k(Reaction.A_DMEf, T, Reaction.Ea_DMEf) / Reaction.K_eq_DME(T)) * (C_F * C_D * R * T * (101325)**-1/C_A)
-        elif self.name == "reaction_4":
-            return Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf) * (C_A * C_C * np.power(R*T/101325, 2, dtype=np.longdouble)) - (Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf)/Reaction.K_eq_DMM(T))*(C_D*C_G*R*T*(101325)**-1/C_A)
-        elif self.name == "reaction_5":
-            return Reaction.k(Reaction.A_DMEHCHO, T, Reaction.Ea_DMEHCHO)*(Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(C_F*R*T/101325)/(1 + Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(C_F*R*T/101325)))*((Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)/(1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)))
-        else:
-            return "Unknown reaction"
+            case "reaction_3":
+                return Reaction.k(Reaction.A_DMEf, T, Reaction.Ea_DMEf) * (C_A*R*T/101325) - (Reaction.k(Reaction.A_DMEf, T, Reaction.Ea_DMEf) / Reaction.K_eq_DME(T)) * (C_F * C_D * R * T * (101325)**-1/C_A)
+            case "reaction_4":
+                return Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf) * (C_A * C_C * np.power(R*T/101325, 2)) - (Reaction.k(Reaction.A_DMMf, T, Reaction.Ea_DMMf)/Reaction.K_eq_DMM(T))*(C_D*C_G*R*T*(101325)**-1/C_A)
+            case "reaction_5":
+                return Reaction.k(Reaction.A_DMEHCHO, T, Reaction.Ea_DMEHCHO)*(Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(C_F*R*T/101325)/(1 + Reaction.k(Reaction.A_DME, T, Reaction.Ea_DME)*(C_F*R*T/101325)))*((Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)/(1 + (Reaction.k(Reaction.A_O2, T, Reaction.Ea_O2) * (abs(C_B*R*T/101325)) ** 0.5)))
+            case _:
+                return "Unknown reaction"

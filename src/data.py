@@ -30,7 +30,7 @@ C_G0 = 0  # [mol/m³]
 C_I0 = 0.985 * (P_0/(R*T_0))  # [mol/m³]
 C_T0 = C_A0 + C_B0 + C_I0
 
-C_As0 = 1e-100  # [mol/m³]
+C_As0 = 1e-10  # [mol/m³]
 C_Bs0 = 0  # [mol/m³]  
 C_Cs0 = 0  # [mol/m³]  
 C_Ds0 = 0  # [mol/m³]  

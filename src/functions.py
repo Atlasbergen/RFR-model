@@ -34,7 +34,7 @@ def q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I):
     return u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)*A_c(r_inner)
 
 
-def G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r):
+def G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T):
     return rho_mix(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)*u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I)
 
 

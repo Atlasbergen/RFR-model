@@ -14,7 +14,7 @@ CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2 = [
     Molecule("Nitrogen", Mw_N2, H_f_N2, Tb_N2, Vb_N2, Param_Mu_N2, Param_Cp_N2, Param_kappa_N2),
 ]
 
-
+print(H2O.Cp(400))
 r1, r2, r3, r4, r5 = [
     Reaction("reaction_1", [1, 0.5], [1, 1], [CH3OH, O2], [HCHO, H2O]),
     Reaction("reaction_2", [1, 0.5], [1, 1], [HCHO, O2], [CO, H2O]),
@@ -24,9 +24,9 @@ r1, r2, r3, r4, r5 = [
 ]
 
 
-def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r, d_t, d_p):
+def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, d_t, d_p):
     return (
-        G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r)
+        G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T)
         * (
             (1 - porosity(d_t, d_p))
             / (
@@ -50,7 +50,7 @@ def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r, d_t, d_p):
                 )
                 / d_p
             )
-            + 1.75 * G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r)
+            + 1.75 * G(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T)
         )
     )
 
@@ -68,7 +68,7 @@ def dCdw(C, p, t):
         r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) - 0.5*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
         r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
         0,
-        -(B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, r_inner, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*((C_T*u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I))/(C_T0*u_0)),
+        -(B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*((C_T*u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I))/(C_T0*u_0)),
         ((-r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r1.H_rxn(T))+(-r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r2.H_rxn(T))+(-r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r3.H_rxn(T))+(-r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r4.H_rxn(T))+(-r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r5.H_rxn(T)))/(F(T, P, C_A, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*CH3OH.Cp(T) + F(T, P, C_B, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*O2.Cp(T) + F(T, P, C_C, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*HCHO.Cp(T) + F(T, P, C_D, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*H2O.Cp(T) + F(T, P, C_E, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*CO.Cp(T) + F(T, P, C_F, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*DME.Cp(T) + F(T, P, C_G, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*DMM.Cp(T) + F(T, P, C_I, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*N2.Cp(T)),
     ]
 
