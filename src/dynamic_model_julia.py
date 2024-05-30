@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.integrate import solve_ivp
+from diffeqpy import de
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import time as tm
@@ -25,20 +25,20 @@ r1, r2, r3, r4, r5 = [
     Reaction("reaction_5", [1, 1], [2, 1], [DME, O2], [HCHO, H2O]),
 ]
 
+
 rho_cat_p = rho_cat * (1-porosity(2*r_inner, 2*r_part))
 AC = a_c(2 * r_inner, 2 * r_part)
-m = 20
-snaps = 100
-t_dur = 1
+
+m = 100
+t_dur = 2000
 
 length = reactor_len(w_cat)
 dx = length / m
 
 num_vars = 16 
 
-def deriv(t, C):
-    dCdt = np.zeros_like(C)
 
+def deriv(dCdt, C, p, t):
     for i in range(1, m):
         
         C_tot = C[i] + C[i + m] + C[i + 2*m] + C[i + 3*m] + C[i + 4*m] + C[i + 5*m] + C[i + 6*m] + C_I0
@@ -229,7 +229,6 @@ def deriv(t, C):
                 )
             ) * a_c(2*r_inner, 2*r_part) * (C[i + 7*m] - C[i + 15*m]) + (rho_cat_p*((-r1.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])*r1.H_rxn(C[i + 15*m])) + (-r2.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])*r2.H_rxn(C[i + 15*m])) + (-r3.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])*r3.H_rxn(C[i + 15*m])) + (-r4.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])*r4.H_rxn(C[i + 15*m])) + (-r5.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])*r5.H_rxn(C[i + 15*m])))))
 
-
     return dCdt
 
 
@@ -240,31 +239,35 @@ uinit[8*m:9*m] = 1e-10
 uinit[m*7:m*8] = T_0
 uinit[m*15:m*16] = T_0
 
-time = np.linspace(0, t_dur, snaps)
+prob = de.ODEProblem(deriv, uinit, (0, t_dur))
 
 start = tm.time()
-sol = solve_ivp(deriv, (0, t_dur), uinit, method='RK45', t_eval=time, atol=1e-6, rtol=1e-6)
+sol = de.solve(prob, de.Tsit5(), maxiters=1e6, saveat=0.01, reltol=1e-7, abstol=1e-7)
 stop = tm.time()
 
 print(stop - start)
 
-x_points = np.linspace(0, 1, m)
+z = sol.t
+u_vals = np.array([sol(i) for i in z]).T
 
-plt.plot(x_points, sol.y[:m, -1], x_points, sol.y[m:2*m, -1], x_points, sol.y[2*m:3*m, -1], x_points, sol.y[3*m:4*m, -1], x_points, sol.y[4*m:5*m, -1], x_points, sol.y[5*m:6*m, -1], x_points, sol.y[6*m:7*m, -1])
+x_points = np.linspace(0, length, m)
 
+plt.plot(x_points, u_vals[:m, -1], x_points, u_vals[m:2*m, -1], x_points, u_vals[2*m:3*m, -1], x_points, u_vals[3*m:4*m, -1], x_points, u_vals[4*m:5*m, -1], x_points, u_vals[5*m:6*m, -1], x_points, u_vals[6*m:7*m, -1])
 plt.show()
 
 
-plt.plot(time, sol.y[16*m-1])
+plt.plot(z, u_vals[16*m-1])
 plt.show()
 
-plt.plot(x_points, sol.y[7*m:8*m, -1], x_points, sol.y[15*m:16*m, -1])
+plt.plot(x_points, u_vals[7*m:8*m, -1], x_points, u_vals[15*m:16*m, -1])
 plt.show()
 
-print(sol.y[m - 1, -1])
+np.savetxt("out_put_data.txt", u_vals)
+
+# print(u_vals[m - 1, -1])
 
 # T, X = np.meshgrid(time, x_points)
-# Z = sol.y[:m, :]
+# Z = u_vals[:m, :]
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')
 # ax.plot_surface(T, X, Z, cmap='viridis')

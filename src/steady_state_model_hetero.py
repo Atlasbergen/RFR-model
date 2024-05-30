@@ -24,7 +24,6 @@ r1, r2, r3, r4, r5 = [
     Reaction("reaction_5", [1, 1], [2, 1], [DME, O2], [HCHO, H2O]),
 ]
 
-print(r1.H_rxn(400))
 
 def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, d_t, d_p):
     return (
@@ -229,7 +228,7 @@ def f(df, f, p, t):
         rho_mix(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),
         Molecule.mu_gas_mix(
             T_f, C_T, [C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
-        ),
+),
         u(T_f, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I0),
         2 * r_part,
         CO.D_eff(T_f, P, C_T, C_E, [C_A, C_B, C_C, C_D, C_F, C_G, C_I0], [CH3OH, O2, HCHO, H2O, DME, DMM, N2]),

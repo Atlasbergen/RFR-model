@@ -67,11 +67,11 @@ def Nu(rho, mu, U, dp, kappa, Cp):
 
 
 def k_c(rho, mu, U, dp, D_eff):
-    return D_eff*Sh(rho, mu, U, dp, D_eff)/dp
+    return D_eff*Sh(rho, mu, U, dp, D_eff)/(dp*porosity(2*r_inner, 2*r_part))
 
 
 def h(rho, mu, U, dp, kappa, Cp):
-    return kappa*Nu(rho, mu, U, dp, kappa, Cp)/dp
+    return kappa*Nu(rho, mu, U, dp, kappa, Cp)/(dp*porosity(2*r_inner, 2*r_part))
 
 
 def mass_mat(size, start_ind):
@@ -87,7 +87,5 @@ def reactor_len(w):
 
 if __name__ == "__main__":
     # test things here
-    print(reactor_len(w_cat))
-    print(u(T_0, P_0, C_T0, C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, C_I0))
-    print(F(T_0, P_0, C_A0, C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, C_I0, C_T0))
-    print(C_A0)
+    print(1-porosity(2*r_inner, 2*r_part), porosity(2*r_inner, 2*r_part))
+    print((1-porosity(2*r_inner, 2*r_part))/porosity(2*r_inner, 2*r_part))
