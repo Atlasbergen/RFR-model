@@ -31,9 +31,9 @@ part_dia = r_part * 2
 eps_fac = (1-porosity(2*r_inner, 2*r_part))/porosity(2*r_inner, 2*r_part)
 eps_fac_2 = porosity(2*r_inner, 2*r_part)/(1-porosity(2*r_inner, 2*r_part))
 
-m = 20
+m = 140
 snaps = 100
-t_dur = 1
+t_dur = 4
 
 length = reactor_len(w_cat)
 dx = length / m
@@ -85,9 +85,7 @@ def deriv(t, C):
 
         dCdt[i + 3*m] = -u_all * ((C[i + 3*m] - C[i-1 + 3*m]) / (dx)) + k_c(
             rho_gas_mix,
-            Molecule.mu_gas_mix(
-                C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2]
-            ),
+            mu_gas_all,
             u_all,
             part_dia,
             H2O.D_eff(C[i + 7*m], P_0, C_tot, C[i + 3*m], [C[i + m], C[i + 2*m], C[i], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, HCHO, CH3OH, CO, DME, DMM, N2]),
@@ -183,7 +181,7 @@ def deriv(t, C):
         ) * AC * (C[i + 6*m] - C[i + 14*m]) + rho_cat_p*eps_fac*r_4_all
         
         if i != m-1:
-            dCdt[i + 15*m] = (1/(rho_cat_p * 450))*(((C[i + 15*m + 1] - 2*C[i + 15*m] + C[i + 15*m - 1])/dx**2) + eps_fac_2*h(
+            dCdt[i + 15*m] = (1/(rho_cat_p * 250))*(((C[i + 15*m + 1] - 2*C[i + 15*m] + C[i + 15*m - 1])/dx**2) + eps_fac_2*h(
                 rho_gas_mix,
                 mu_gas_all,
                 u_all,
@@ -192,7 +190,7 @@ def deriv(t, C):
                 Cp_gas
             ) * AC * (C[i + 7*m] - C[i + 15*m]) + (rho_cat_p*((-r_1_all*r1.H_rxn(C[i + 15*m])) + (-r_2_all*r2.H_rxn(C[i + 15*m])) + (-r_3_all*r3.H_rxn(C[i + 15*m])) + (-r_4_all*r4.H_rxn(C[i + 15*m])) + (-r_5_all*r5.H_rxn(C[i + 15*m])))))
         else:
-            dCdt[i + 15*m] = (1/(rho_cat_p * 450))*(eps_fac_2*h(
+            dCdt[i + 15*m] = (1/(rho_cat_p * 250))*(eps_fac_2*h(
                 rho_gas_mix,
                 mu_gas_all,
                 u_all,
@@ -215,25 +213,27 @@ uinit[m*15:m*16] = T_0
 time = np.linspace(0, t_dur, snaps)
 
 start = tm.time()
-sol = solve_ivp(deriv, (0, t_dur), uinit, method='RK45', t_eval=time, atol=1e-6, rtol=1e-6)
+sol = solve_ivp(deriv, (0, t_dur), uinit, method='RK23', t_eval=time, atol=1e-6, rtol=1e-6)
 stop = tm.time()
 
 print(stop - start)
 
-x_points = np.linspace(0, 1, m)
+x_points = np.linspace(0, length, m)
 
 plt.plot(x_points, sol.y[:m, -1], x_points, sol.y[m:2*m, -1], x_points, sol.y[2*m:3*m, -1], x_points, sol.y[3*m:4*m, -1], x_points, sol.y[4*m:5*m, -1], x_points, sol.y[5*m:6*m, -1], x_points, sol.y[6*m:7*m, -1])
 
 plt.show()
 
 
-plt.plot(time, sol.y[16*m-1])
+plt.plot(time, sol.y[16*m - 1])
 plt.show()
 
 plt.plot(x_points, sol.y[7*m:8*m, -1], x_points, sol.y[15*m:16*m, -1])
 plt.show()
 
 print(sol.y[m - 1, -1])
+
+np.savetxt("out_put_data.txt", sol.y[2*m:3*m, -1])
 
 # T, X = np.meshgrid(time, x_points)
 # Z = sol.y[:m, :]

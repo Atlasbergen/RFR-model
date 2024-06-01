@@ -32,8 +32,8 @@ part_dia = r_part * 2
 eps_fac = (1-porosity(2*r_inner, 2*r_part))/porosity(2*r_inner, 2*r_part)
 eps_fac_2 = porosity(2*r_inner, 2*r_part)/(1-porosity(2*r_inner, 2*r_part))
 
-m = 100
-t_dur = 2000
+m = 10
+t_dur = 4
 
 length = reactor_len(w_cat)
 dx = length / m
@@ -182,7 +182,7 @@ def deriv(dCdt, C, p, t):
         ) * AC * (C[i + 6*m] - C[i + 14*m]) + rho_cat_p*eps_fac*r_4_all
         
         if i != m-1:
-            dCdt[i + 15*m] = (1/(rho_cat_p * 450))*(((C[i + 15*m + 1] - 2*C[i + 15*m] + C[i + 15*m - 1])/dx**2) + eps_fac_2*h(
+            dCdt[i + 15*m] = (1/(rho_cat_p * 250))*(((C[i + 15*m + 1] - 2*C[i + 15*m] + C[i + 15*m - 1])/dx**2) + eps_fac_2*h(
                 rho_gas_mix,
                 mu_gas_all,
                 u_all,
@@ -191,7 +191,7 @@ def deriv(dCdt, C, p, t):
                 Cp_gas
             ) * AC * (C[i + 7*m] - C[i + 15*m]) + (rho_cat_p*((-r_1_all*r1.H_rxn(C[i + 15*m])) + (-r_2_all*r2.H_rxn(C[i + 15*m])) + (-r_3_all*r3.H_rxn(C[i + 15*m])) + (-r_4_all*r4.H_rxn(C[i + 15*m])) + (-r_5_all*r5.H_rxn(C[i + 15*m])))))
         else:
-            dCdt[i + 15*m] = (1/(rho_cat_p * 450))*(eps_fac_2*h(
+            dCdt[i + 15*m] = (1/(rho_cat_p * 250))*(eps_fac_2*h(
                 rho_gas_mix,
                 mu_gas_all,
                 u_all,
@@ -213,7 +213,7 @@ uinit[m*15:m*16] = T_0
 prob = de.ODEProblem(deriv, uinit, (0, t_dur))
 
 start = tm.time()
-sol = de.solve(prob, de.Tsit5(), maxiters=1e6, saveat=0.01, reltol=1e-7, abstol=1e-7)
+sol = de.solve(prob, de.RK4(), maxiters=1e7, saveat=0.01, reltol=1e-6, abstol=1e-6)
 stop = tm.time()
 
 print(stop - start)
@@ -233,7 +233,9 @@ plt.show()
 plt.plot(x_points, u_vals[7*m:8*m, -1], x_points, u_vals[15*m:16*m, -1])
 plt.show()
 
-np.savetxt("out_put_data.txt", u_vals)
+print(u_vals[m - 1, -1])
+
+# np.savetxt("out_put_data.txt", u_vals)
 
 # print(u_vals[m - 1, -1])
 
