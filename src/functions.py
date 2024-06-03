@@ -1,9 +1,15 @@
 from data import *
 import numpy as np
+from functools import lru_cache
 
-
+@lru_cache(maxsize=None)
 def rho_mix(T, P, C_tot, C_meth, C_O2, C_HCHO, C_H2O, C_CO, C_DME, C_DMM, C_N2):
-    return 32.042e-3*(C_meth*P/(R*T*C_tot)) + 32e-3*(C_O2*P/(R*T*C_tot)) + 28e-3*(C_N2*P/(R*T*C_tot)) + 18e-3*(C_H2O*P/(R*T*C_tot)) + 30e-3*(C_HCHO*P/(R*T*C_tot)) + 28e-3*(C_CO*P/(R*T*C_tot)) + 46.047e-3*(C_DME*P/(R*T*C_tot)) + 76.097e-3*(C_DMM*P/(R*T*C_tot))
+    p_constant = P/(R*T*C_tot)
+    return p_constant*(32.042e-3*C_meth + 32e-3*C_O2 + 28e-3*C_N2 + 18e-3*C_H2O + 30e-3*C_HCHO + 28e-3*C_CO + 46.047e-3*C_DME + 76.097e-3*C_DMM)
+
+
+# def rho_mix(T, P, C_tot, C_meth, C_O2, C_HCHO, C_H2O, C_CO, C_DME, C_DMM, C_N2):
+#     return 32.042e-3*(C_meth*P/(R*T*C_tot)) + 32e-3*(C_O2*P/(R*T*C_tot)) + 28e-3*(C_N2*P/(R*T*C_tot)) + 18e-3*(C_H2O*P/(R*T*C_tot)) + 30e-3*(C_HCHO*P/(R*T*C_tot)) + 28e-3*(C_CO*P/(R*T*C_tot)) + 46.047e-3*(C_DME*P/(R*T*C_tot)) + 76.097e-3*(C_DMM*P/(R*T*C_tot))
 
 
 def porosity(d_t, d_p):
