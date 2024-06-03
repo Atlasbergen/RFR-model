@@ -31,7 +31,7 @@ part_dia = r_part * 2
 eps_fac = (1-porosity(2*r_inner, 2*r_part))/porosity(2*r_inner, 2*r_part)
 eps_fac_2 = porosity(2*r_inner, 2*r_part)/(1-porosity(2*r_inner, 2*r_part))
 
-m = 140
+m = 40
 snaps = 100
 t_dur = 4
 
@@ -39,18 +39,20 @@ length = reactor_len(w_cat)
 dx = length / m
 
 num_vars = 16 
+entries = num_vars*m
 
 def deriv(t, C):
-    dCdt = np.zeros_like(C)
+    # dCdt = np.zeros_like(C)
+    dCdt = [0] * entries
 
     for i in range(1, m):
         
         C_tot = C[i] + C[i + m] + C[i + 2*m] + C[i + 3*m] + C[i + 4*m] + C[i + 5*m] + C[i + 6*m] + C_I0
         u_all = u(C[i + 7*m], P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0)
         rho_gas_mix = rho_mix(C[i + 7*m], P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0)
-        mu_gas_all = Molecule.mu_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
-        kappa_gas = Molecule.kappa_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
-        Cp_gas = Molecule.Cp_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
+        mu_gas_all = mu_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
+        kappa_gas = kappa_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
+        Cp_gas = Cp_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
 
         r_1_all = r1.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
         r_2_all = r2.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
@@ -106,7 +108,7 @@ def deriv(t, C):
             part_dia,
             DME.D_eff(C[i + 7*m], P_0, C_tot, C[i + 5*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2]),
         ) * AC * (C[i + 13*m] - C[i + 5*m])
-
+        
         dCdt[i + 6*m] = -u_all * ((C[i + 6*m] - C[i-1 + 6*m]) / (dx)) + k_c(
             rho_gas_mix,
             mu_gas_all,
@@ -171,7 +173,7 @@ def deriv(t, C):
         part_dia,
         DME.D_eff(C[i + 7*m], P_0, C_tot, C[i + 5*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2]),
         ) * AC * (C[i + 5*m] - C[i + 13*m]) + rho_cat_p*eps_fac*(r_3_all - 0.5*r_5_all)
-
+        
         dCdt[i + 14*m] = k_c(
         rho_gas_mix,
         mu_gas_all,
@@ -198,7 +200,6 @@ def deriv(t, C):
                 kappa_gas,
                 Cp_gas
             ) * AC * (C[i + 7*m] - C[i + 15*m]) + (rho_cat_p*((-r_1_all*r1.H_rxn(C[i + 15*m])) + (-r_2_all*r2.H_rxn(C[i + 15*m])) + (-r_3_all*r3.H_rxn(C[i + 15*m])) + (-r_4_all*r4.H_rxn(C[i + 15*m])) + (-r_5_all*r5.H_rxn(C[i + 15*m])))))
-
 
     return dCdt
 
@@ -231,9 +232,12 @@ plt.show()
 plt.plot(x_points, sol.y[7*m:8*m, -1], x_points, sol.y[15*m:16*m, -1])
 plt.show()
 
+print(C_A0)
 print(sol.y[m - 1, -1])
+print(sol.y[2*m - 1, -1])
+print(sol.y[3*m - 1, -1])
 
-np.savetxt("out_put_data.txt", sol.y[2*m:3*m, -1])
+# np.savetxt("out_put_data.txt", sol.y[2*m:3*m, -1])
 
 # T, X = np.meshgrid(time, x_points)
 # Z = sol.y[:m, :]
