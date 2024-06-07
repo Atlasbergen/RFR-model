@@ -13,7 +13,7 @@ CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2 = [
     Molecule("Water", Mw_H2O, H_f_H2O, Tb_H2O, Vb_H2O, Param_Mu_H2O, Param_Cp_H2O, Param_kappa_H2O,),
     Molecule("Carbon Monoxide", Mw_CO, H_f_CO, Tb_CO, Vb_CO, Param_Mu_CO, Param_Cp_CO, Param_kappa_CO,),
     Molecule("DME", Mw_DME, H_f_DME, Tb_DME, Vb_DME, Param_Mu_DME, Param_Cp_DME, Param_kappa_DME,),
-    Molecule("DMM", Mw_DMM, H_f_DMM, Tb_DMM, Vb_DMM, Param_Mu_DMM, [0, 0, 0, 0], Param_kappa_DMM,),
+    Molecule("DMM", Mw_DMM, H_f_DMM, Tb_DMM, Vb_DMM, Param_Mu_DMM, Param_Cp_DMM, Param_kappa_DMM,),
     Molecule("Nitrogen", Mw_N2, H_f_N2, Tb_N2, Vb_N2, Param_Mu_N2, Param_Cp_N2, Param_kappa_N2,),
 ]
 
@@ -183,7 +183,7 @@ def deriv(t, C):
         ) * AC * (C[i + 6*m] - C[i + 14*m]) + rho_cat_p*eps_fac*r_4_all
         
         if i != m-1:
-            dCdt[i + 15*m] = (1/(rho_cat_p * 250))*(((C[i + 15*m + 1] - 2*C[i + 15*m] + C[i + 15*m - 1])/dx**2) + eps_fac_2*h(
+            dCdt[i + 15*m] = (1/(rho_cat_p * 374 * 0.8))*(((C[i + 15*m + 1] - 2*C[i + 15*m] + C[i + 15*m - 1])/dx**2) + eps_fac_2*h(
                 rho_gas_mix,
                 mu_gas_all,
                 u_all,
@@ -192,7 +192,7 @@ def deriv(t, C):
                 Cp_gas
             ) * AC * (C[i + 7*m] - C[i + 15*m]) + (rho_cat_p*((-r_1_all*r1.H_rxn(C[i + 15*m])) + (-r_2_all*r2.H_rxn(C[i + 15*m])) + (-r_3_all*r3.H_rxn(C[i + 15*m])) + (-r_4_all*r4.H_rxn(C[i + 15*m])) + (-r_5_all*r5.H_rxn(C[i + 15*m])))))
         else:
-            dCdt[i + 15*m] = (1/(rho_cat_p * 250))*(eps_fac_2*h(
+            dCdt[i + 15*m] = (1/(rho_cat_p * 374 * 0.8))*(eps_fac_2*h(
                 rho_gas_mix,
                 mu_gas_all,
                 u_all,

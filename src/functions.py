@@ -2,7 +2,7 @@ from data import *
 import numpy as np
 from functools import lru_cache
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1000)
 def rho_mix(T, P, C_tot, C_meth, C_O2, C_HCHO, C_H2O, C_CO, C_DME, C_DMM, C_N2):
     p_constant = P/(R*T*C_tot)
     return p_constant*(32.042e-3*C_meth + 32e-3*C_O2 + 28e-3*C_N2 + 18e-3*C_H2O + 30e-3*C_HCHO + 28e-3*C_CO + 46.047e-3*C_DME + 76.097e-3*C_DMM)
@@ -15,9 +15,11 @@ def rho_mix(T, P, C_tot, C_meth, C_O2, C_HCHO, C_H2O, C_CO, C_DME, C_DMM, C_N2):
 def porosity(d_t, d_p):
     return 0.38 + 0.0073 * (1 + (((d_t / d_p) - 2) / (d_t / d_p)) ** 2)
 
+por = porosity(2*r_inner, 2*r_part)
+
 
 def a_c(dt, dp):  # fogler sida -> 698
-    return 6*(1-porosity(dt, dp))/dp
+    return 6*(1-por)/dp
 
 
 def A_c(r):
@@ -73,11 +75,11 @@ def Nu(rho, mu, U, dp, kappa, Cp):
 
 
 def k_c(rho, mu, U, dp, D_eff):
-    return D_eff*Sh(rho, mu, U, dp, D_eff)/(dp*porosity(2*r_inner, 2*r_part))
+    return D_eff*Sh(rho, mu, U, dp, D_eff)/(dp*por)
 
 
 def h(rho, mu, U, dp, kappa, Cp):
-    return kappa*Nu(rho, mu, U, dp, kappa, Cp)/(dp*porosity(2*r_inner, 2*r_part))
+    return kappa*Nu(rho, mu, U, dp, kappa, Cp)/(dp*por)
 
 
 def mass_mat(size, start_ind):
@@ -89,7 +91,7 @@ def mass_mat(size, start_ind):
 
 
 def reactor_len(w):
-    return w / (rho_cat*(1-porosity(2*r_inner, 2*r_part))*A_c(r_inner))
+    return w / (rho_cat*(1-por)*A_c(r_inner))
 
 if __name__ == "__main__":
     # test things here
