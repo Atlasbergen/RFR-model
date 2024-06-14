@@ -31,7 +31,7 @@ part_dia = r_part * 2
 eps_fac = (1-porosity(2*r_inner, 2*r_part))/porosity(2*r_inner, 2*r_part)
 eps_fac_2 = porosity(2*r_inner, 2*r_part)/(1-porosity(2*r_inner, 2*r_part))
 
-m = 80
+m = 40
 snaps = 100
 t_dur = 4
 
@@ -53,11 +53,73 @@ def deriv(t, C):
         kappa_gas = kappa_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
         Cp_gas = Cp_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
 
-        r_1_all = r1.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
-        r_2_all = r2.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
-        r_3_all = r3.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
-        r_4_all = r4.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
-        r_5_all = r5.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
+        D_A_eff = CH3OH.D_eff(C[i + 7*m], P_0, C_tot, C[i], [C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, HCHO, H2O, CO, DME, DMM, N2])
+        D_B_eff = O2.D_eff(C[i + 7*m], P_0, C_tot, C[i + m], [C[i], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, HCHO, H2O, CO, DME, DMM, N2])
+        D_C_eff = HCHO.D_eff(C[i + 7*m], P_0, C_tot, C[i + 2*m], [C[i + m], C[i], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, CH3OH, H2O, CO, DME, DMM, N2])
+        D_D_eff = H2O.D_eff(C[i + 7*m], P_0, C_tot, C[i + 3*m], [C[i + m], C[i + 2*m], C[i], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, HCHO, CH3OH, CO, DME, DMM, N2])
+        D_E_eff = CO.D_eff(C[i + 7*m], P_0, C_tot, C[i + 4*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, DME, DMM, N2])
+        D_F_eff = DME.D_eff(C[i + 7*m], P_0, C_tot, C[i + 5*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2])
+        D_G_eff = DMM.D_eff(C[i + 7*m], P_0, C_tot, C[i + 6*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, N2])
+
+
+        n_1 = eta(
+            theta(
+                Reaction.k(A_HCHO, C[i + 15*m], Ea_HCHO),
+                D_A_eff,
+                C[i] + 1e-6,
+                C[i + 15*m],
+                e1=-1,
+            )
+        )
+
+        n_2 = eta(
+            theta(
+                Reaction.k(A_CO, C[i + 15*m], Ea_CO),
+                D_C_eff,
+                1,
+                C[i + 15*m],
+                e2=1,
+            )
+        )
+
+        n_3 = eta(
+            theta(
+                Reaction.k(A_DMEf, C[i + 15*m], Ea_DMEf),
+                D_A_eff,
+                1,
+                C[i + 15*m],
+                e2=1,
+            )
+        )
+
+        n_4 = eta(
+            theta(
+                Reaction.k(A_DMMf, C[i + 15*m], Ea_DMMf),
+                D_A_eff,
+                C[i],
+                C[i + 15*m],
+                e1=1,
+                e2=2,
+            )
+        )
+
+        n_5 = eta(
+            theta(
+                Reaction.k(A_DMEHCHO, C[i + 15*m], Ea_DMEHCHO),
+                D_F_eff,
+                C[i + 5*m] + 1e-6,
+                C[i + 15*m],
+                e1=-1,
+            )
+        )
+
+        # print(theta(Reaction.k(A_HCHO, C[i + 15*m], Ea_HCHO), D_A_eff, C[i] + 1e-6, C[i + 15*m], e1=-1), n_1, n_2, n_3, n_4, n_5)
+        
+        r_1_all = n_1*r1.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
+        r_2_all = n_2*r2.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
+        r_3_all = n_3*r3.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
+        r_4_all = n_4*r4.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
+        r_5_all = n_5*r5.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
 
 
         dCdt[i] = -u_all * ((C[i] - C[i-1]) / (dx)) + k_c(
@@ -65,7 +127,7 @@ def deriv(t, C):
             mu_gas_all,
             u_all,
             part_dia,
-            CH3OH.D_eff(C[i + 7*m], P_0, C_tot, C[i], [C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, HCHO, H2O, CO, DME, DMM, N2]),
+            D_A_eff,
         ) * AC * (C[i + 8*m] - C[i])
 
         dCdt[i + m] = -u_all * ((C[i + m] - C[i-1 + m]) / (dx)) + k_c(
@@ -73,7 +135,7 @@ def deriv(t, C):
             mu_gas_all,
             u_all,
             part_dia,
-            O2.D_eff(C[i + 7*m], P_0, C_tot, C[i + m], [C[i], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, HCHO, H2O, CO, DME, DMM, N2]),
+            D_B_eff,
         ) * AC * (C[i + 9*m] - C[i + m])
 
         dCdt[i + 2*m] = -u_all * ((C[i + 2*m] - C[i-1 + 2*m]) / (dx)) + k_c(
@@ -81,7 +143,7 @@ def deriv(t, C):
             mu_gas_all,
             u_all,
             part_dia,
-            HCHO.D_eff(C[i + 7*m], P_0, C_tot, C[i + 2*m], [C[i + m], C[i], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, CH3OH, H2O, CO, DME, DMM, N2]),
+            D_C_eff,
         ) * AC * (C[i + 10*m] - C[i + 2*m])
 
         dCdt[i + 3*m] = -u_all * ((C[i + 3*m] - C[i-1 + 3*m]) / (dx)) + k_c(
@@ -89,7 +151,7 @@ def deriv(t, C):
             mu_gas_all,
             u_all,
             part_dia,
-            H2O.D_eff(C[i + 7*m], P_0, C_tot, C[i + 3*m], [C[i + m], C[i + 2*m], C[i], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, HCHO, CH3OH, CO, DME, DMM, N2]),
+            D_D_eff,
         ) * AC * (C[i + 11*m] - C[i + 3*m])
         
         dCdt[i + 4*m] = -u_all * ((C[i + 4*m] - C[i-1 + 4*m]) / (dx)) + k_c(
@@ -97,7 +159,7 @@ def deriv(t, C):
             mu_gas_all,
             u_all,
             part_dia,
-            CO.D_eff(C[i + 7*m], P_0, C_tot, C[i + 4*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, DME, DMM, N2]),
+            D_E_eff,
         ) * AC * (C[i + 12*m] - C[i + 4*m])
 
         dCdt[i + 5*m] = -u_all * ((C[i + 5*m] - C[i-1 + 5*m]) / (dx)) + k_c(
@@ -105,7 +167,7 @@ def deriv(t, C):
             mu_gas_all,
             u_all,
             part_dia,
-            DME.D_eff(C[i + 7*m], P_0, C_tot, C[i + 5*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2]),
+            D_F_eff,
         ) * AC * (C[i + 13*m] - C[i + 5*m])
 
         dCdt[i + 6*m] = -u_all * ((C[i + 6*m] - C[i-1 + 6*m]) / (dx)) + k_c(
@@ -113,7 +175,7 @@ def deriv(t, C):
             mu_gas_all,
             u_all,
             part_dia,
-            DMM.D_eff(C[i + 7*m], P_0, C_tot, C[i + 6*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, N2]),
+            D_G_eff,
         ) * AC * (C[i + 14*m] - C[i + 6*m])
 
         dCdt[i + 7*m] = -u_all * ((C[i + 7*m] - C[i-1 + 7*m]) / (dx)) + h(
@@ -130,7 +192,7 @@ def deriv(t, C):
         mu_gas_all,
         u_all,
         part_dia,
-        CH3OH.D_eff(C[i + 7*m], P_0, C_tot, C[i], [C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, HCHO, H2O, CO, DME, DMM, N2]),
+        D_A_eff,
         ) * AC * (C[i] - C[i + 8*m]) - rho_cat_p*eps_fac*(r_1_all + 2*r_3_all + 2*r_4_all)
 
         dCdt[i + 9*m] = k_c(
@@ -138,7 +200,7 @@ def deriv(t, C):
         mu_gas_all,
         u_all,
         part_dia,
-        O2.D_eff(C[i + 7*m], P_0, C_tot, C[i + m], [C[i], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, HCHO, H2O, CO, DME, DMM, N2]),
+        D_B_eff,
         ) * AC * (C[i + m] - C[i + 9*m]) - 0.5*rho_cat_p*eps_fac*(r_1_all + r_2_all + r_5_all)
 
         dCdt[i + 10*m] = k_c(
@@ -146,7 +208,7 @@ def deriv(t, C):
         mu_gas_all,
         u_all,
         part_dia,
-        HCHO.D_eff(C[i + 7*m], P_0, C_tot, C[i + 2*m], [C[i + m], C[i], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, CH3OH, H2O, CO, DME, DMM, N2]),
+        D_C_eff,
         ) * AC * (C[i + 2*m] - C[i + 10*m]) + rho_cat_p*eps_fac*((r_1_all + r_5_all) - (r_2_all + r_4_all))
 
         dCdt[i + 11*m] = k_c(
@@ -154,7 +216,7 @@ def deriv(t, C):
         mu_gas_all,
         u_all,
         part_dia,
-        H2O.D_eff(C[i + 7*m], P_0, C_tot, C[i + 3*m], [C[i + m], C[i + 2*m], C[i], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, HCHO, CH3OH, CO, DME, DMM, N2]),
+        D_D_eff,
         ) * AC * (C[i + 3*m] - C[i + 11*m]) + rho_cat_p*eps_fac*(r_1_all + r_2_all + r_3_all + r_4_all + 0.5*r_5_all)
 
         dCdt[i + 12*m] = k_c(
@@ -162,7 +224,7 @@ def deriv(t, C):
         mu_gas_all,
         u_all,
         part_dia,
-        CO.D_eff(C[i + 7*m], P_0, C_tot, C[i + 4*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, DME, DMM, N2]),
+        D_E_eff,
     ) * AC * (C[i + 4*m] - C[i + 12*m]) + rho_cat_p*eps_fac*r_2_all
 
         dCdt[i + 13*m] = k_c(
@@ -170,7 +232,7 @@ def deriv(t, C):
         mu_gas_all,
         u_all,
         part_dia,
-        DME.D_eff(C[i + 7*m], P_0, C_tot, C[i + 5*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2]),
+        D_F_eff,
         ) * AC * (C[i + 5*m] - C[i + 13*m]) + rho_cat_p*eps_fac*(r_3_all - 0.5*r_5_all)
 
         dCdt[i + 14*m] = k_c(
@@ -178,7 +240,7 @@ def deriv(t, C):
         mu_gas_all,
         u_all,
         part_dia,
-        DMM.D_eff(C[i + 7*m], P_0, C_tot, C[i + 6*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, N2]),
+        D_G_eff,
         ) * AC * (C[i + 6*m] - C[i + 14*m]) + rho_cat_p*eps_fac*r_4_all
         
         if i != m-1:

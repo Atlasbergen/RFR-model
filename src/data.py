@@ -5,6 +5,7 @@ sa_cat = 6e-3  # [m²/kg]
 alpha = sa_cat*rho_cat  # [m⁻¹]
 w_cat = 240  # [kg]
 r_part = 10e-3  # [m]
+Dpe = r_part / 3 # [m]
 T_0 = 220 + 273.15  # [K]
 Ts_0 = T_0
 P_0 = 101325  # [Pa]

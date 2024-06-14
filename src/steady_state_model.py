@@ -41,7 +41,7 @@ def B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, d_t, d_p):
                 (
                     150
                     * (1 - porosity(d_t, d_p))
-                    * Molecule.mu_gas_mix(
+                    * mu_gas_mix(
                         T,
                         C_T,
                         [C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I],
@@ -59,17 +59,19 @@ def dCdw(C, p, t):
     C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T = C
     C_T = C_A + C_B + C_C + C_D + C_E + C_F + C_G + C_I
 
+    print(T)
+
     return [
-        -(r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 2*r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 2*r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)),
-        -0.5*(r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)),
-        (r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)) - (r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)),
-        r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.5*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
-        r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
-        r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) - 0.5*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
-        r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G),
+        -(0.2*r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 2*0.95*r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 2*0.8*r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G))/q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I),
+        -0.5*(0.2*r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.9*r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.3*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G))/q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I),
+        ((0.2*r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.3*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)) - (0.9*r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.8*r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)))/q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I),
+        (0.2*r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.9*r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.95*r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.8*r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) + 0.5*0.3*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G))/q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I),
+        0.9*r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)/q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I),
+        (0.95*r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G) - 0.5*0.3*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G))/q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I),
+        0.8*r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)/q_dot(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I),
         0,
-        -(B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*((C_T*u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I))/(C_T0*u_0)),
-        ((-r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r1.H_rxn(T))+(-r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r2.H_rxn(T))+(-r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r3.H_rxn(T))+(-r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r4.H_rxn(T))+(-r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*r5.H_rxn(T)))/(F(T, P, C_A, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*CH3OH.Cp(T) + F(T, P, C_B, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*O2.Cp(T) + F(T, P, C_C, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*HCHO.Cp(T) + F(T, P, C_D, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*H2O.Cp(T) + F(T, P, C_E, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*CO.Cp(T) + F(T, P, C_F, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*DME.Cp(T) + F(T, P, C_G, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*DMM.Cp(T) + F(T, P, C_I, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*N2.Cp(T)),
+        0, # -(B_0(C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, P, T, 2*r_inner, 2*r_part)/(A_c(r_inner)*(1-porosity(2*r_inner, 2*r_part))*rho_cat))*(T/T_0)*(P_0/P)*((C_T*u(T, P, C_T, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I))/(C_T0*u_0)),
+        ((-0.2*r1.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*0.2*r1.H_rxn(T))+(-0.9*r2.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*0.9*r2.H_rxn(T))+(-0.95*r3.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*0.95*r3.H_rxn(T))+(-0.8*r4.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*0.8*r4.H_rxn(T))+(-0.3*r5.r(T, C_A, C_B, C_C, C_D, C_E, C_F, C_G)*0.3*r5.H_rxn(T)))/(F(T, P, C_A, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*CH3OH.Cp(T) + F(T, P, C_B, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*O2.Cp(T) + F(T, P, C_C, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*HCHO.Cp(T) + F(T, P, C_D, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*H2O.Cp(T) + F(T, P, C_E, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*CO.Cp(T) + F(T, P, C_F, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*DME.Cp(T) + F(T, P, C_G, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*DMM.Cp(T) + F(T, P, C_I, C_A, C_B, C_C, C_D, C_E, C_F, C_G, C_I, C_T)*N2.Cp(T)),
     ]
 
 
@@ -82,7 +84,7 @@ def condition(out, u, t, integrator):
     out[5] = u[5]
     out[6] = u[6]
     out[8] = u[8] - 1000
-    out[9] = u[9] - 1000
+    out[9] = u[9] - 700
     return out
 
 
@@ -114,7 +116,7 @@ w_span = (0, w_cat)
 C_0 = [C_A0, C_B0, C_C0, C_D0, C_E0, C_F0, C_G0, C_I0, P_0, T_0]
 
 prob = de.ODEProblem(dCdw, C_0, w_span)
-sol = de.solve(prob, de.Tsit5(), callback = cb, saveat=0.001)
+sol = de.solve(prob, de.Tsit5(), callback = cb, saveat=0.001, reltol=1e-8, abstol=1e-8)
 
 w = sol.t
 u_vals = np.array([sol(i) for i in w]).T
