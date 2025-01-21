@@ -1,36 +1,32 @@
 R = 8.314  # [J/(mol*K)]
-r_inner = 0.25  # [m]
+r_inner = 0.05  # [m]
 rho_cat = 1000  # [kg/m³]
-sa_cat = 6e-3  # [m²/kg]
-alpha = sa_cat*rho_cat  # [m⁻¹]
-w_cat = 240  # [kg]
-r_part = 10e-3  # [m]
+w_cat = 4.755 # 0.9157 # [kg]
+r_part = 3e-3  # [m]
 Dpe = r_part / 3 # [m]
-T_0 = 220 + 273.15  # [K]
-Ts_0 = T_0
+T_0 = 170 + 273.15  # [K]
+Ts_0 = 240 + 273.15
+T_cool = 200 + 273.15 
 P_0 = 101325  # [Pa]
-u_0 = 2  # [m/s]
+u_0 = 1 # [m/s]
 
-F_A0 = 0.25  # [mol/s]
-F_B0 = 0.125  # [mol/S]
-F_C0 = 0  # [mol/s]
-F_D0 = 0  # [mol/s]
-F_E0 = 0  # [mol/s]
-F_F0 = 0  # [mol/s]
-F_G0 = 0  # [mol/s]
-F_I0 = 24.625  # [mol/s]
-F_T0 = F_A0 + F_B0 + F_I0
+UA = 50*(4/(2*r_inner)) # [W / m³ K]
 
-C_A0 = 0.01* (P_0/(R*T_0))  # [mol/m³]
-C_B0 = 0.005 * (P_0/(R*T_0))  # [mol/m³]
+C_A0 = 0.01 * (P_0/(R*T_0))  # [mol/m³]
+C_B0 = 0.21 * 0.99 * (P_0/(R*T_0))  # [mol/m³]
 C_C0 = 0  # [mol/m³]
 C_D0 = 0  # [mol/m³]
 C_E0 = 0  # [mol/m³]
 C_F0 = 0  # [mol/m³]
 C_G0 = 0  # [mol/m³]
-C_I0 = 0.985 * (P_0/(R*T_0))  # [mol/m³]
+C_I0 = 0.79 * 0.99 * (P_0/(R*T_0))  # [mol/m³]
 C_T0 = C_A0 + C_B0 + C_I0
 
+q_dot_0 = u_0*3.14*r_inner*r_inner*0.71
+print(q_dot_0)
+
+# F_A = C_A0*u_0*3.14*(r_inner**2)
+# print(C_A0, F_A)
 C_As0 = 1e-10  # [mol/m³]
 C_Bs0 = 0  # [mol/m³]  
 C_Cs0 = 0  # [mol/m³]  
@@ -129,3 +125,11 @@ Param_kappa_Me, Param_kappa_O2, Param_kappa_H2O, Param_kappa_HCHO, Param_kappa_C
     [0.00033143, 0.7722, 16.323, 373.72],
     [-2.7748e-3, 2.9488e-5, 1.1508e-7, -4.5122e-11]
 ]
+
+dh1 = (H_f_H2O + H_f_HCHO) - (H_f_Me + 0.5*H_f_O2)
+dh2 = (H_f_CO + H_f_H2O) - (H_f_HCHO + 0.5*H_f_O2)
+dh3 = (H_f_DME + H_f_H2O) - (2*H_f_Me) 
+dh4 = (H_f_DMM + H_f_H2O) - (2*H_f_Me + H_f_HCHO)
+dh5 = (2*H_f_HCHO + H_f_H2O) - (H_f_DME + H_f_O2)
+
+# print(dh1/1000, dh2/1000, dh3/1000, dh4/1000, dh5/1000)

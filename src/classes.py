@@ -1,6 +1,7 @@
 from scipy.integrate import quad
 from math import exp, sinh, cosh
 from functools import lru_cache
+import numpy as np
 
 R = 8.314
 
@@ -33,6 +34,14 @@ def Cp_gas_mix(T, C_T, Conc, Molecules):  # Motivation from Properties of gases 
     sum = 0
     for i in range(len(Conc)):
         sum += (Conc[i]/C_T) * Molecules[i].Cp(T)
+
+    return sum
+
+
+def Cp_gas_mix_2(T, C_T, Conc, Molecules):  # Motivation from Properties of gases and liquids
+    sum = 0
+    for i in range(len(Conc)):
+        sum += (Conc[i]/C_T) * Molecules[i].Cp(T) * (1000/Molecules[i].M_w)
 
     return sum
 
@@ -75,19 +84,7 @@ class Molecule:
     def rho(self, P: float, T: float) -> float:
         return self.M_w*(abs(P)/(R*T))
 
-    # def Cp(self, T: float) -> float:
-    #     if self.name == "DMM":
-    #         T2 = T*T
-    #         T3 = T2*T
-    #         return 51.161 + 0.16244*T + 8.26e-5*(T2) + (-8.51e-8*(T3))  # C_p for DMM method of Joback parameters found in The properties of gases and liquids 
-    #     else:
-    #         return (self.params_cp[0] + (self.params_cp[1]*(self.params_cp[2]/(T*sinh(self.params_cp[2]/T)))**2) + (self.params_cp[3]*(self.params_cp[4]/(T*cosh(self.params_cp[4]/T)))**2))*1e-3  # from perry 2-149
-    
-    # def Cp(self, T: float) -> float:
-    #     T2 = T*T
-    #     return self.params_cp[2] + self.params_cp[1]*T + self.params_cp[0]*T2
-    
-    def Cp(self, T: float) -> float:
+    def Cp(self, T: float) -> float: # C_p for DMM method of Joback parameters found in The properties of gases and liquids, others from perry 2-149
         T2 = T*T
         T3 = T2*T
         return self.params_cp[3] + self.params_cp[2]*T + self.params_cp[1]*T2 + self.params_cp[0]*T3
@@ -156,30 +153,22 @@ class Reaction:
     # Arrhenius equation. Used for rate constant and adsorption constants (based on kinetics from Deshmuk).
     @staticmethod
     def k(A: float, T: float, Ea: float) -> float:
-        return A * exp(-Ea / (R * T))
-    
+        return A * np.exp(-Ea / (R * T))
+
     def del_cp(self, T):
         
-        if len(self.reactants) == 1:
-            reac_result = self.stoich_coeff_reac[0]*self.reactants[0].Cp(T)
-        else:
-            reac_result = self.stoich_coeff_reac[0]*self.reactants[0].Cp(T) + self.stoich_coeff_reac[1]*self.reactants[1].Cp(T)
+        reac_result = 0
+        for i in range(len(self.reactants)):
+            reac_result += (self.stoich_coeff_reac[i]*self.reactants[i].Cp(T))
 
-
-        prod_result = self.stoich_coeff_prod[0]*self.products[0].Cp(T) + self.stoich_coeff_prod[1]*self.products[1].Cp(T)
-
-        # reac_result = 0
-        # for i in range(len(self.reactants)):
-        #     reac_result += (self.stoich_coeff_reac[i]*self.reactants[i].Cp(T))
-        #
-        # prod_result = 0
-        # for i in range(len(self.products)):
-        #     prod_result += (self.stoich_coeff_prod[i]*self.products[i].Cp(T))
+        prod_result = 0
+        for i in range(len(self.products)):
+            prod_result += (self.stoich_coeff_prod[i]*self.products[i].Cp(T))
 
         return prod_result - reac_result
 
     def H_rxn(self, T, T_ref=298.15):
-
+       
         reac_result = 0
         for i in range(len(self.reactants)):
             reac_result += (self.stoich_coeff_reac[i]*self.reactants[i].H_f)
@@ -188,32 +177,11 @@ class Reaction:
         for i in range(len(self.products)):
             prod_result += (self.stoich_coeff_prod[i]*self.products[i].H_f)
 
-        return (prod_result - reac_result) + quad(self.del_cp, T_ref, T)[0]
+        return (prod_result - reac_result) + quad(self.del_cp, T_ref, T, limit=100)[0]
 
     def r(self, T, C_A, C_B, C_C, C_D, C_E, C_F, C_G):
         reaction_name = self.name
-        
-        if C_A < 0:
-            C_A = 1e-10
-        
-        if C_B < 0:
-            C_B = 0
-
-        if C_C < 0:
-            C_C = 0
-
-        if C_D < 0:
-            C_D = 0
-
-        if C_E < 0:
-            C_E = 0
-
-        if C_F < 0:
-            C_F = 0
-
-        if C_G < 0:
-            C_G = 0
-        
+            
         if reaction_name == "reaction_1":
             return (
                 Reaction.k(Reaction.A_HCHO, T, Reaction.Ea_HCHO)

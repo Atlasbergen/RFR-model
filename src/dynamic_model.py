@@ -1,7 +1,5 @@
 import numpy as np
 from scipy.integrate import solve_ivp
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import time as tm
 from classes import *
 from functions import *
@@ -25,21 +23,21 @@ r1, r2, r3, r4, r5 = [
     Reaction("reaction_5", [1, 1], [2, 1], [DME, O2], [HCHO, H2O]),
 ]
 
-rho_cat_p = rho_cat * (1-porosity(2*r_inner, 2*r_part))
+rho_cat_p = rho_cat * (1-porosity(2*r_inner, Dpe))
 AC = a_c(2 * r_inner, 2 * r_part)
 part_dia = r_part * 2
-eps_fac = (1-porosity(2*r_inner, 2*r_part))/porosity(2*r_inner, 2*r_part)
-eps_fac_2 = porosity(2*r_inner, 2*r_part)/(1-porosity(2*r_inner, 2*r_part))
+eps_fac = (1-porosity(2*r_inner, Dpe))/porosity(2*r_inner, Dpe)
+eps_fac_2 = porosity(2*r_inner, Dpe)/(1-porosity(2*r_inner, Dpe))
 
-m = 40
-snaps = 100
-t_dur = 5
+m = 30 
+snaps = 500
+t_dur = 3000
 
 length = reactor_len(w_cat)
 dx = length / m
 
 num_vars = 16 
-entries = num_vars*m
+entries = num_vars * m
 
 def deriv(t, C):
     # dCdt = np.zeros_like(C)
@@ -52,8 +50,16 @@ def deriv(t, C):
         rho_gas_mix = rho_mix(C[i + 7*m], P_0, C_tot, C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0)
         mu_gas_all = mu_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
         kappa_gas = kappa_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
-        Cp_gas = Cp_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
-
+        # Cp_gas = Cp_gas_mix(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
+        Cp_gas_kg = Cp_gas_mix_2(C[i + 7*m], C_tot, [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, DMM, N2])
+        
+        K_disp = K_ax(
+            2*r_part,
+            Cp_gas_kg,
+            Re(rho_gas_mix, mu_gas_all, u_all, 2*r_part),
+            Pr(mu_gas_all, kappa_gas, Cp_gas_kg) 
+        )
+        
         D_A_eff = CH3OH.D_eff(C[i + 7*m], P_0, C_tot, C[i], [C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, HCHO, H2O, CO, DME, DMM, N2])
         D_B_eff = O2.D_eff(C[i + 7*m], P_0, C_tot, C[i + m], [C[i], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [CH3OH, HCHO, H2O, CO, DME, DMM, N2])
         D_C_eff = HCHO.D_eff(C[i + 7*m], P_0, C_tot, C[i + 2*m], [C[i + m], C[i], C[i + 3*m], C[i + 4*m], C[i + 5*m], C[i + 6*m], C_I0], [O2, CH3OH, H2O, CO, DME, DMM, N2])
@@ -62,12 +68,64 @@ def deriv(t, C):
         D_F_eff = DME.D_eff(C[i + 7*m], P_0, C_tot, C[i + 5*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 6*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DMM, N2])
         D_G_eff = DMM.D_eff(C[i + 7*m], P_0, C_tot, C[i + 6*m], [C[i], C[i + m], C[i + 2*m], C[i + 3*m], C[i + 4*m], C[i + 5*m], C_I0], [CH3OH, O2, HCHO, H2O, CO, DME, N2])
 
+        Dax_A = D_ax(
+            2*r_part,
+            u_all, 
+            Re(rho_gas_mix, mu_gas_all, u_all, 2*r_part),
+            Sc(rho_gas_mix, mu_gas_all, D_A_eff)
+        )
+        
+        Dax_B = D_ax(
+            2*r_part,
+            u_all, 
+            Re(rho_gas_mix, mu_gas_all, u_all, 2*r_part),
+            Sc(rho_gas_mix, mu_gas_all, D_A_eff)
+        )
 
+        Dax_C = D_ax(
+            2*r_part,
+            u_all, 
+            Re(rho_gas_mix, mu_gas_all, u_all, 2*r_part),
+            Sc(rho_gas_mix, mu_gas_all, D_A_eff)
+        )
+
+
+        Dax_D = D_ax(
+            2*r_part,
+            u_all, 
+            Re(rho_gas_mix, mu_gas_all, u_all, 2*r_part),
+            Sc(rho_gas_mix, mu_gas_all, D_A_eff)
+        )
+
+
+        Dax_E = D_ax(
+            2*r_part,
+            u_all, 
+            Re(rho_gas_mix, mu_gas_all, u_all, 2*r_part),
+            Sc(rho_gas_mix, mu_gas_all, D_A_eff)
+        )
+
+        
+        Dax_F = D_ax(
+            2*r_part,
+            u_all, 
+            Re(rho_gas_mix, mu_gas_all, u_all, 2*r_part),
+            Sc(rho_gas_mix, mu_gas_all, D_A_eff)
+        )
+
+        
+        Dax_G = D_ax(
+            2*r_part,
+            u_all, 
+            Re(rho_gas_mix, mu_gas_all, u_all, 2*r_part),
+            Sc(rho_gas_mix, mu_gas_all, D_A_eff)
+        )
+        
         n_1 = eta(
             theta(
                 Reaction.k(A_HCHO, C[i + 15*m], Ea_HCHO),
                 D_A_eff,
-                C[i] + 1e-6,
+                C[i + 8*m] + 1e-6,
                 C[i + 15*m],
                 e1=-1,
             )
@@ -97,7 +155,7 @@ def deriv(t, C):
             theta(
                 Reaction.k(A_DMMf, C[i + 15*m], Ea_DMMf),
                 D_A_eff,
-                C[i] + 1e-6,
+                C[i + 8*m] + 1e-6,
                 C[i + 15*m],
                 e1=1,
                 e2=2,
@@ -108,7 +166,7 @@ def deriv(t, C):
             theta(
                 Reaction.k(A_DMEHCHO, C[i + 15*m], Ea_DMEHCHO),
                 D_F_eff,
-                C[i + 5*m] + 1e-6,
+                C[i + 12*m] + 1e-6,
                 C[i + 15*m],
                 e1=-1,
             )
@@ -123,70 +181,146 @@ def deriv(t, C):
         r_5_all = n_5*r5.r(C[i + 15*m], C[i + 8*m], C[i + 9*m], C[i + 10*m], C[i + 11*m], C[i + 12*m], C[i + 13*m], C[i + 14*m])
 
 
-        dCdt[i] = -u_all * ((C[i] - C[i-1]) / (dx)) + k_c(
-            rho_gas_mix,
-            mu_gas_all,
-            u_all,
-            part_dia,
-            D_A_eff,
-        ) * AC * (C[i + 8*m] - C[i])
+        if i == m-1 or i == 0 or i == 1:
+            dCdt[i] = -u_all * ((C[i] - C[i-1]) / (dx)) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_A_eff,
+            ) * AC * (C[i + 8*m] - C[i])
+        else:
+            dCdt[i] = -u_all * ((C[i] - C[i-1]) / (dx)) + Dax_A*((C[i + 1] - 2*C[i] + C[i - 1])/dx**2) +  k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_A_eff,
+            ) * AC * (C[i + 8*m] - C[i])
 
-        dCdt[i + m] = -u_all * ((C[i + m] - C[i-1 + m]) / (dx)) + k_c(
-            rho_gas_mix,
-            mu_gas_all,
-            u_all,
-            part_dia,
-            D_B_eff,
-        ) * AC * (C[i + 9*m] - C[i + m])
+        if i == m-1 or i == 0 or i == 1:
+            dCdt[i + m] = -u_all * ((C[i + m] - C[i-1 + m]) / (dx)) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_B_eff,
+            ) * AC * (C[i + 9*m] - C[i + m])
+        else:
+            dCdt[i + m] = -u_all * ((C[i + m] - C[i-1 + m]) / (dx)) +  Dax_B*((C[i + m + 1] - 2*C[i + m] + C[i + m - 1])/dx**2) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_B_eff,
+            ) * AC * (C[i + 9*m] - C[i + m])
 
-        dCdt[i + 2*m] = -u_all * ((C[i + 2*m] - C[i-1 + 2*m]) / (dx)) + k_c(
-            rho_gas_mix,
-            mu_gas_all,
-            u_all,
-            part_dia,
-            D_C_eff,
-        ) * AC * (C[i + 10*m] - C[i + 2*m])
-
-        dCdt[i + 3*m] = -u_all * ((C[i + 3*m] - C[i-1 + 3*m]) / (dx)) + k_c(
-            rho_gas_mix,
-            mu_gas_all,
-            u_all,
-            part_dia,
-            D_D_eff,
-        ) * AC * (C[i + 11*m] - C[i + 3*m])
+            
+        if i == m-1 or i == 0 or i == 1:
+            dCdt[i + 2*m] = -u_all * ((C[i + 2*m] - C[i-1 + 2*m]) / (dx)) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_C_eff,
+            ) * AC * (C[i + 10*m] - C[i + 2*m])
+        else:
+            dCdt[i + 2*m] = -u_all * ((C[i + 2*m] - C[i-1 + 2*m]) / (dx)) + Dax_C*((C[i + 2*m + 1] - 2*C[i + 2*m] + C[i + 2*m - 1])/dx**2) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_C_eff,
+            ) * AC * (C[i + 10*m] - C[i + 2*m])
         
-        dCdt[i + 4*m] = -u_all * ((C[i + 4*m] - C[i-1 + 4*m]) / (dx)) + k_c(
-            rho_gas_mix,
-            mu_gas_all,
-            u_all,
-            part_dia,
-            D_E_eff
-        ) * AC * (C[i + 12*m] - C[i + 4*m])
+        if i == m-1 or i == 0 or i == 1:
+            dCdt[i + 3*m] = -u_all * ((C[i + 3*m] - C[i-1 + 3*m]) / (dx)) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_D_eff,
+            ) * AC * (C[i + 11*m] - C[i + 3*m])
+        else:
+            dCdt[i + 3*m] = -u_all * ((C[i + 3*m] - C[i-1 + 3*m]) / (dx)) + Dax_D*((C[i + 3*m + 1] - 2*C[i + 3*m] + C[i + 3*m - 1])/dx**2) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_D_eff,
+            ) * AC * (C[i + 11*m] - C[i + 3*m])
 
-        dCdt[i + 5*m] = -u_all * ((C[i + 5*m] - C[i-1 + 5*m]) / (dx)) + k_c(
-            rho_gas_mix,
-            mu_gas_all,
-            u_all,
-            part_dia,
-            D_F_eff,
-        ) * AC * (C[i + 13*m] - C[i + 5*m])
         
-        dCdt[i + 6*m] = -u_all * ((C[i + 6*m] - C[i-1 + 6*m]) / (dx)) + k_c(
-            rho_gas_mix,
-            mu_gas_all,
-            u_all,
-            part_dia,
-            D_G_eff,
-        ) * AC * (C[i + 14*m] - C[i + 6*m])
+        if i == m-1 or i == 0 or i == 1:
+            dCdt[i + 4*m] = -u_all * ((C[i + 4*m] - C[i-1 + 4*m]) / (dx)) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_E_eff
+            ) * AC * (C[i + 12*m] - C[i + 4*m])
+        else:
+            dCdt[i + 4*m] = -u_all * ((C[i + 4*m] - C[i-1 + 4*m]) / (dx)) + Dax_E*((C[i + 4*m + 1] - 2*C[i + 4*m] + C[i + 4*m - 1])/dx**2) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_E_eff
+            ) * AC * (C[i + 12*m] - C[i + 4*m])
+        
+        if i == m-1 or i == 0 or i == 1:
+            dCdt[i + 5*m] = -u_all * ((C[i + 5*m] - C[i-1 + 5*m]) / (dx)) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_F_eff,
+            ) * AC * (C[i + 13*m] - C[i + 5*m])
+        else:
+            dCdt[i + 5*m] = -u_all * ((C[i + 5*m] - C[i-1 + 5*m]) / (dx)) + Dax_F*((C[i + 5*m + 1] - 2*C[i + 5*m] + C[i + 5*m - 1])/dx**2) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_F_eff,
+            ) * AC * (C[i + 13*m] - C[i + 5*m])
 
-        dCdt[i + 7*m] = -u_all * ((C[i + 7*m] - C[i-1 + 7*m]) / (dx)) + h(
-            rho_gas_mix,
-            mu_gas_all,
-            u_all,
-            part_dia,
-            kappa_gas,
-            Cp_gas
-        ) * AC * (1/(CH3OH.Cp(C[i + 7*m])*C[i] + O2.Cp(C[i + 7*m])*C[i + m] + HCHO.Cp(C[i + 7*m])*C[i + 2*m] + H2O.Cp(C[i + 7*m])*C[i + 3*m] + CO.Cp(C[i + 7*m])*C[i + 4*m] + DME.Cp(C[i + 7*m])*C[i + 5*m] + DMM.Cp(C[i + 7*m])*C[i + 6*m] + N2.Cp(C[i + 7*m])*C_I0)) * (C[i + 15*m] - C[i + 7*m])
+        
+        if i == m-1 or i == 0 or i == 1:
+            dCdt[i + 6*m] = -u_all * ((C[i + 6*m] - C[i-1 + 6*m]) / (dx)) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_G_eff,
+            ) * AC * (C[i + 14*m] - C[i + 6*m])
+        else:
+            dCdt[i + 6*m] = -u_all * ((C[i + 6*m] - C[i-1 + 6*m]) / (dx)) + Dax_G*((C[i + 6*m + 1] - 2*C[i + 6*m] + C[i + 6*m - 1])/dx**2) + k_c(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                D_G_eff,
+            ) * AC * (C[i + 14*m] - C[i + 6*m])
+
+        if i == m-1 or i == 0 or i == 1:
+            dCdt[i + 7*m] = -u_all * ((C[i + 7*m] - C[i-1 + 7*m]) / (dx)) + ((h(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                kappa_gas,
+                Cp_gas_kg
+            ) * AC  * (C[i + 15*m] - C[i + 7*m]))) * (1/(CH3OH.Cp(C[i + 7*m])*C[i] + O2.Cp(C[i + 7*m])*C[i + m] + HCHO.Cp(C[i + 7*m])*C[i + 2*m] + H2O.Cp(C[i + 7*m])*C[i + 3*m] + CO.Cp(C[i + 7*m])*C[i + 4*m] + DME.Cp(C[i + 7*m])*C[i + 5*m] + DMM.Cp(C[i + 7*m])*C[i + 6*m] + N2.Cp(C[i + 7*m])*C_I0)) 
+        else:
+            dCdt[i + 7*m] = -u_all * ((C[i + 7*m] - C[i-1 + 7*m]) / (dx)) + ((K_disp*((C[i + 15*m + 1] - 2*C[i + 15*m] + C[i + 15*m - 1])/dx**2)) + (h(
+                rho_gas_mix,
+                mu_gas_all,
+                u_all,
+                part_dia,
+                kappa_gas,
+                Cp_gas_kg
+            ) * AC  * (C[i + 15*m] - C[i + 7*m]))) * (1/(CH3OH.Cp(C[i + 7*m])*C[i] + O2.Cp(C[i + 7*m])*C[i + m] + HCHO.Cp(C[i + 7*m])*C[i + 2*m] + H2O.Cp(C[i + 7*m])*C[i + 3*m] + CO.Cp(C[i + 7*m])*C[i + 4*m] + DME.Cp(C[i + 7*m])*C[i + 5*m] + DMM.Cp(C[i + 7*m])*C[i + 6*m] + N2.Cp(C[i + 7*m])*C_I0)) 
         
         dCdt[i + 8*m] = k_c(
             rho_gas_mix,
@@ -244,34 +378,33 @@ def deriv(t, C):
         D_G_eff,
         ) * AC * (C[i + 6*m] - C[i + 14*m]) + rho_cat_p*eps_fac*r_4_all
         
-        if i != m-1:
-            dCdt[i + 15*m] = (1/(rho_cat_p * 374 * 0.8))*(((C[i + 15*m + 1] - 2*C[i + 15*m] + C[i + 15*m - 1])/dx**2) + eps_fac_2*h(
+        if i == m-1 or i == 0 or i == 1:
+            dCdt[i + 15*m] = (1/(rho_cat_p * Cp_cat(C[i + 15*m])))*(eps_fac_2*h(
                 rho_gas_mix,
                 mu_gas_all,
                 u_all,
                 part_dia,
                 kappa_gas,
-                Cp_gas
+                Cp_gas_kg
             ) * AC * (C[i + 7*m] - C[i + 15*m]) + (rho_cat_p*((-r_1_all*r1.H_rxn(C[i + 15*m])) + (-r_2_all*r2.H_rxn(C[i + 15*m])) + (-r_3_all*r3.H_rxn(C[i + 15*m])) + (-r_4_all*r4.H_rxn(C[i + 15*m])) + (-r_5_all*r5.H_rxn(C[i + 15*m])))))
         else:
-            dCdt[i + 15*m] = (1/(rho_cat_p * 374 * 0.8))*(eps_fac_2*h(
+            dCdt[i + 15*m] = (1/(rho_cat_p * Cp_cat(C[i + 15*m])))*((thermcond_cat(C[i + 15*m])*(C[i + 15*m + 1] - 2*C[i + 15*m] + C[i + 15*m - 1])/dx**2) + eps_fac_2*h(
                 rho_gas_mix,
                 mu_gas_all,
                 u_all,
                 part_dia,
                 kappa_gas,
-                Cp_gas
+                Cp_gas_kg
             ) * AC * (C[i + 7*m] - C[i + 15*m]) + (rho_cat_p*((-r_1_all*r1.H_rxn(C[i + 15*m])) + (-r_2_all*r2.H_rxn(C[i + 15*m])) + (-r_3_all*r3.H_rxn(C[i + 15*m])) + (-r_4_all*r4.H_rxn(C[i + 15*m])) + (-r_5_all*r5.H_rxn(C[i + 15*m])))))
 
     return dCdt
-
 
 uinit = np.zeros(num_vars*m)
 uinit[0] = C_A0
 uinit[m] = C_B0
 uinit[8*m:9*m] = 1e-10
 uinit[m*7:m*8] = T_0
-uinit[m*15:m*16] = T_0
+uinit[m*15:m*16] = Ts_0
 
 time = np.linspace(0, t_dur, snaps)
 
@@ -281,32 +414,4 @@ stop = tm.time()
 
 print(stop - start)
 
-x_points = np.linspace(0, length, m)
-
-plt.plot(x_points, sol.y[:m, -1], x_points, sol.y[m:2*m, -1], x_points, sol.y[2*m:3*m, -1], x_points, sol.y[3*m:4*m, -1], x_points, sol.y[4*m:5*m, -1], x_points, sol.y[5*m:6*m, -1], x_points, sol.y[6*m:7*m, -1])
-
-plt.show()
-
-
-plt.plot(time, sol.y[16*m - 1])
-plt.show()
-
-plt.plot(x_points, sol.y[7*m:8*m, -1], x_points, sol.y[15*m:16*m, -1])
-plt.show()
-
-print(C_A0)
-print(sol.y[m - 1, -1])
-print(sol.y[2*m - 1, -1])
-print(sol.y[3*m - 1, -1])
-
-# np.savetxt("out_put_data.txt", sol.y[2*m:3*m, -1])
-
-# T, X = np.meshgrid(time, x_points)
-# Z = sol.y[:m, :]
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# ax.plot_surface(T, X, Z, cmap='viridis')
-# ax.set_xlabel('Time')
-# ax.set_ylabel('Space')
-# ax.set_zlabel('Concentration')
-# plt.show()
+np.savetxt("output_data_dynamic_comp.txt", sol.y)
